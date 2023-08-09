@@ -1,0 +1,10 @@
+1. check if username and email is already taken in sign up 
+2. Finish Navbar (condition rendering with the login and sign in, profile pic or user when signed in)
+3. finish home page
+4. make signup
+
+
+set profile picture button
+
+POTENTIAL PROBLEMS
+-alphabet for names, signup
