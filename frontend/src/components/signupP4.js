@@ -43,7 +43,7 @@ const PageFour = ({ page, setPage, signup, error, loading, attemptCancel, setAtt
                         <input type="text" name='username' className='w-72 bg-gray-300 p-3 border border-solid border-gray-300 rounded focus:border focus:border-app-blue focus:outline-none' onChange={(e) => setUsername(e.target.value)} value={username} placeholder='Username'></input>
                     </div>
                     {error && <div className='ml-auto mr-auto mb-10 border-2 rounded border-solid border-red-600 bg-red-300 w-72 font-medium px-2 py-3'>{error}</div>}
-                    <button className='font-bold bg-gradient-to-b from-gradient-su-blue to-gradient-su-teal text-white rounded px-3 py-1 mb-10'>{loading ? <span className='flex align-center animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-white rounded-full'></span> : "Signup"}</button>
+                    <button className='font-bold bg-gradient-to-b from-gradient-su-blue to-gradient-su-teal text-white rounded px-4 py-2 mb-10'>{loading ? <span className='flex align-center animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-white rounded-full'></span> : "Signup"}</button>
                 </form>
             </div>
         </div>

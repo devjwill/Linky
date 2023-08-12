@@ -31,7 +31,8 @@ export const useLogin = () => {
             //update the authentication state
             dispatch({type: "LOGIN", payload: json})
             setLoading(false)
-            console.log("username: " + username + " password: " + password)
+            // console.log("username: " + username + " password: " + password)
+            console.log(json)
         }
     }
     return { login, loading, error }

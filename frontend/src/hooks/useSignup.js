@@ -21,15 +21,14 @@ export const useSignup = () => {
             setError(json.error)
         }
 
-        const extractValues = (response) => {
-            const { username, password } = response
-            return { username, password }
-        }
-
         if (response.ok) {
-            const extractedData = extractValues(response)
-            localStorage.setItem('user', JSON.stringify(extractedData))
-            dispatch({type: "LOGIN", payload: extractedData})
+            //save user to local storage
+            localStorage.setItem('user', JSON.stringify(json))
+
+            //update authentication state
+            dispatch({type: "LOGIN", payload: json})
+            setLoading(false)
+            console.log(json)
         }
     }
     return { signup, loading, error}

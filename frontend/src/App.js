@@ -18,6 +18,7 @@ function App() {
       <BrowserRouter>
         <div>
           <Routes>
+            <Route path='' element={<Navigate to={'/home'}/>}/>
             <Route path="/home" element={<Home/>} />
             <Route path="/login" element={user ? <Navigate to="/admin"/> : <Login/>} />
             <Route path="/signup" element={user ? <Navigate to="/admin"/> : <Signup/>} />

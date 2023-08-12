@@ -4,13 +4,41 @@ const validator = require('validator')
 
 const Schema = mongoose.Schema
 
+//Schema that has individual link's data
+const linkSchema = new Schema({
+    url: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    title: {
+        type: String,
+        default: ''
+    },
+    thumbnail: {
+        type: String,
+        default: null
+    },
+    visible: {
+        type: Boolean,
+        default: true
+    }
+})
+
+// Schema that contains each of the user's link objects in an array
+const parentSchema = new Schema({
+    links: [linkSchema]
+})
+
+//Schema that holds user's data
 const userSchema = new Schema({
     firstName: {
         type: String,
         required: true
     },
     lastName: {
-        type: String
+        type: String,
+        default: ''
     },
     email: {
         type: String,
@@ -27,10 +55,14 @@ const userSchema = new Schema({
         unique: true
     },
     profilePicture: {
-        type: String
-    }
+        type: String,
+        default: null
+    },
+    linksData: {
+        type: parentSchema,
+        default: {}
+    } 
 })
-
 
 //Signup Function
 userSchema.statics.signup = async function (firstName, lastName, email, password, username, profilePicture) {
@@ -38,18 +70,52 @@ userSchema.statics.signup = async function (firstName, lastName, email, password
     if(!firstName || !email || !password || !username) {
         throw Error("All required fields must be filled.")
     }
-    if(firstName.trim() === "" || /^[A-Za-z]+(?:[-']{1}(?![\s'-]))?[A-Za-z]+$/.test(firstName)) {
-        throw Error("Input a valid first name")
+  
+    const regex = /^[\p{L}']+$/u //Regex for different alphabets
+    //First name validation
+    if(firstName.includes(`'`)) {
+        throw Error("Please input a valid first name")
     }
-    if(firstName.length > 50) {
+    if(!validator.isAlpha(firstName)) {
+        if(!validator.matches(firstName, regex)) {
+            throw Error("Please input a valid first name")
+        }
+    }
+    if(firstName.length > 15) {
         throw Error("Maximum character length for name is 50")
     }
+
+    //Last name validation
+    if(lastName) {
+        if(lastName.includes(`'`)) {
+            throw Error("Please input a valid last name")
+        }
+        if(!validator.isAlpha(lastName)) {
+            if(!validator.matches(lastName, regex)) {
+                throw Error("Please input a valid last name")
+            }
+        }
+        if(lastName.length > 15) {
+            throw Error("Maximum character length for a name is 15")
+        }
+    }
+
+    //Email validation - real email
     if(!validator.isEmail(email)) {
         throw Error("Email is not valid.")
     }
+
+    //Password validaton - strong password
     if(!validator.isStrongPassword(password)) {
         throw Error("Password is not strong enough.")
     }
+
+    //Username validation - max length
+    if(username.length > 20) {
+        throw Error("Maximum character length for username is 20")
+    }
+
+
 
     //Email and Username uniqueness
     const emailExists = await this.findOne({ email })

@@ -31,13 +31,10 @@ const PageThree = ({ page, setPage, attemptCancel, setAttemptCancel, handleCance
 
     const handleDivClick = (e) => {
         console.log(e)
-        if (e.target.id === '') {
-            const test = document.getElementById('setProfilePic').htmlfor
-            test.click()
-            console.log('div')
-        } else {
-            console.log("please just once")
-        }
+        // if (e.target.lastChild.attributes.id.nodeValue === "setProfilePic") {
+        //     document.getElementById("setProfilePic").click()
+        // }
+        document.getElementById("setProfilePic").click()
     }
 
 
@@ -50,7 +47,8 @@ const PageThree = ({ page, setPage, attemptCancel, setAttemptCancel, handleCance
                     <input type="text" className="w-72 bg-gray-300 mx-auto p-3 border border-solid border-gray-300 rounded focus:border focus:border-app-blue focus:outline-none" placeholder="Username" onChange={(e) => setUsername(e.target.value)} value={username || ""}></input>
                     {!profilePicture && 
                         <div className="w-72 p-3 rounded bg-gray-300 mx-auto hover:cursor-pointer" onClick={handleDivClick}>
-                            <label htmlFor="setProfilePic" className=" font-medium hover:cursor-pointer">Set profile picture</label>
+                            <p className="font-medium">Set Profile Pic</p>
+                            <label htmlFor="setProfilePic" className=" font-medium hover:cursor-pointer"></label>
                             <input type="file" id="setProfilePic" ref={fileInputRef} className="hidden" onChange={handleChange} accept=".jpg, .jpeg, .png"/>
                         </div>}
                     {profilePicture && 
