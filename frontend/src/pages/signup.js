@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
 import { useSignup } from "../hooks/useSignup"
-import PageOne from "../components/signupP1"
-import PageTwo from "../components/signupP2"
-import PageThree from "../components/signupP3"
-import PageFour from "../components/signupP4"
+import PageOne from "../components/signup/signupP1"
+import PageTwo from "../components/signup/signupP2"
+import PageThree from "../components/signup/signupP3"
+import PageFour from "../components/signup/signupP4"
 
 
 const Signup = () => {

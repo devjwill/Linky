@@ -1,34 +1,14 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const validator = require('validator')
+const Link = require('./linkModel')
 
 const Schema = mongoose.Schema
 
-//Schema that has individual link's data
-const linkSchema = new Schema({
-    url: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    title: {
-        type: String,
-        default: ''
-    },
-    thumbnail: {
-        type: String,
-        default: null
-    },
-    visible: {
-        type: Boolean,
-        default: true
-    }
-})
-
 // Schema that contains each of the user's link objects in an array
-const parentSchema = new Schema({
-    links: [linkSchema]
-})
+// const parentSchema = new Schema({
+//     links: []
+// })
 
 //Schema that holds user's data
 const userSchema = new Schema({
@@ -58,10 +38,14 @@ const userSchema = new Schema({
         type: String,
         default: null
     },
-    linksData: {
-        type: parentSchema,
-        default: {}
-    } 
+    // linksData: {
+    //     type: parentSchema,
+    //     default: {}
+    // } 
+    links: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Link'
+    }]
 })
 
 //Signup Function

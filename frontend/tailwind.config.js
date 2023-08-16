@@ -9,7 +9,11 @@ module.exports = {
       colors: {
         'app-blue': '#3F60B4',
         'gradient-su-blue': '#5682F1',
-        'gradient-su-teal': '#27CCF0'
+        'gradient-su-teal': '#27CCF0',
+        'admin-background': '#FFFFF7',
+        'admin-nav-links': '#303030',
+        'divsion-line': '#E0E0E0',
+        'white': '#FFFFFF'
       },
       fontFamily: {
         'sans': ['Inter', 'ui-sans-serif', 'system-ui']

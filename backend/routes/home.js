@@ -8,7 +8,7 @@ const router = express.Router();
 router.get('/home', getHome);
 
 //Templates
-router.get('/templates', getTemplates);
+// router.get('/templates', getTemplates);
 
 //Frequently Asked Questions
 router.get('/faq', getFAQ);

@@ -2,12 +2,24 @@ const express = require('express');
 const requireAuth = require('../middleware/requireAuth')
 
 //Controller Functions
-const { getAdmin } = require('../controllers/adminController');
+const { getAdmin, getUserData, createLink, editLink, deleteLink } = require('../controllers/adminController');
 
 const router = express.Router();
 
 //Require authorization
 router.use(requireAuth)
+
+//Get all links
+router.get('/:username', getUserData)
+
+//create a new link
+router.post('/:username', createLink)
+
+//update a link
+router.patch('/:id', editLink)
+
+//delete a link
+router.delete('/:id', deleteLink)
 
 //GET admin page
 router.get('/admin', getAdmin);
