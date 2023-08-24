@@ -19,6 +19,17 @@ export const adminReducer = (state, action) => {
                     links: [action.payload, ...state.admin.links]
                 }
             }
+        case 'DELETE_LINK':
+            return {
+                admin: {
+                    ...state.admin,
+                    user: {
+                        ...state.admin.user,
+                        links: state.admin.user.links.filter(link => link !== action.payload._id)
+                    },
+                    links: state.admin.links.filter(link => link._id !== action.payload._id)
+                }
+            }
         default:
             return state
     }

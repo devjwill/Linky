@@ -4,7 +4,16 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        'xs': '480px'
+        'xxs': '480px',
+        'xs': "576px",
+        'idk': '768px',
+        'sm': '960px',
+        'kdi': '1200px',
+        'md': '1440px',
+        'lg': '1680px',
+        'xl': '1920px',
+        '2xl': '2240px',
+        '3xl': '2560px'
       },
       colors: {
         'app-blue': '#3F60B4',

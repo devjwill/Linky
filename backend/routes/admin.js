@@ -19,7 +19,7 @@ router.post('/:username', createLink)
 router.patch('/:id', editLink)
 
 //delete a link
-router.delete('/:id', deleteLink)
+router.delete('/:username', deleteLink)
 
 //GET admin page
 router.get('/admin', getAdmin);

@@ -3,7 +3,7 @@ import adminLogo from '../../assests/adminLogo.svg'
 // import { FontAwesomeIcon } from '@fontawesome/react-fontawesome'
 import { FaLink, FaShapes, FaChartSimple, FaShareNodes, FaCircleUser, FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
 const AdminNavbar = ({ user, admin, windowWidth, page, setPage }) => {
-    // console.log(admin)
+    console.log(admin)
     if (windowWidth > 767) {
         return (
             <nav className='py-5 px-7 flex justify-between bg-white shadow-xl' id='navbar'>

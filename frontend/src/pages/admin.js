@@ -42,7 +42,7 @@ const Admin = () => {
             console.log("getting admin data")
         }
         
-    }, [dispatch, user])
+    }, [dispatch])
 
     //get the screen width
     const handleResize = () => {
@@ -63,7 +63,7 @@ const Admin = () => {
             {page === 0 && <Links windowWidth={windowWidth}/>}
             {page === 1 && <Appearance/>}
             {page === 2 && <Analytics/>}
-            <button className="bg-red-600 rounded-full p-3 text-white font-bold" onClick={logout}>Logout</button>
+            {/* <button className="bg-red-600 rounded-full p-3 text-white font-bold" onClick={logout}>Logout</button> */}
         </div>
     )
 }

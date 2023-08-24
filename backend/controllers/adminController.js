@@ -62,11 +62,68 @@ const createLink = async (req, res) => {
 
 const editLink = async (req, res) => {
     console.log('editing a link')
-    res.status(200)
+    const { id } = req.params
+    const { title, url, thumbnail, visible } = req.body
+
+    if (!id) {
+        return res.status(400).json({error: '_id parameter is missing'})
+    }
+
+    const link = await Link.find({ _id: id })
+    if (!link) {
+        return res.status(404).json({error: 'Link not found'})
+    }
+
+    if (title === "" || url === "") {
+        return res.status(400).json({error: 'This field cannot be empty.'})
+    }
+
+    let newLink
+
+    if (title) {
+        newLink = await Link.findOneAndUpdate({ _id: id }, { $set: { title } }, { returnOriginal: false })
+    } else if (url) {
+        newLink = await Link.findOneAndUpdate({ _id: id }, { $set: { url } }, { returnOriginal: false })
+    } else if (thumbnail) {
+        newLink = await Link.findOneAndUpdate({ _id: id }, { $set: { thumbnail } }, { returnOriginal: false })
+    } else if (visible) {
+        newLink = await Link.findOneAndUpdate({ _id: id }, { $set: { visible } }, { returnOriginal: false })
+    } else if(!newLink) {
+        return res.status(400).json({error: 'No changes made'})
+    }
+
+    res.status(200).json(newLink)
 }
+
 const deleteLink = async (req, res) => {
     console.log('deleting a link')
-    res.status(200)
+    const { username } = req.params
+    const { url } = req.body
+    if (!username) {
+        res.status(400).json({error: "Username parameter is missing."})
+    }
+    const user = await User.find({ username })
+    if (!user) {
+        res.status(404).josn({error: 'User not found'})
+    }
+
+    const userID = user[0]._id
+
+    const deletedLinkFromLink = await Link.findOneAndDelete({user: userID, url})
+    if(!deletedLinkFromLink) {
+        res.status(404).json({error: 'Link not found in links collection'})
+    }
+
+    const linkID = deletedLinkFromLink._id
+
+    const deletedLinkFromUser = await User.updateOne({ username }, { $pull: { ["links"]: { $in: linkID } } })
+
+    if (deletedLinkFromUser.matchedCount !== 1) {
+        res.status(404).json({error: "Link not found in user's collection"})
+    }
+
+
+    res.status(200).json(deletedLinkFromLink)
 }
 
 module.exports = { getAdmin, getUserData, createLink, editLink, deleteLink }
