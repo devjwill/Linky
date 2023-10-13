@@ -2,7 +2,7 @@ const express = require('express');
 const requireAuth = require('../middleware/requireAuth')
 
 //Controller Functions
-const { getAdmin, getUserData, createLink, editLink, deleteLink } = require('../controllers/adminController');
+const { getAdmin, getUserData, createLink, editLink, deleteLink, editOrder, getLinkData, patch } = require('../controllers/adminController');
 
 const router = express.Router();
 
@@ -15,11 +15,13 @@ router.get('/:username', getUserData)
 //create a new link
 router.post('/:username', createLink)
 
-//update a link
-router.patch('/:id', editLink)
+//PATCH Requests
+router.patch('/patch', patch)
+
 
 //delete a link
 router.delete('/:username', deleteLink)
+
 
 //GET admin page
 router.get('/admin', getAdmin);

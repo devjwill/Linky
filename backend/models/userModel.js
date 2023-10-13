@@ -38,6 +38,48 @@ const userSchema = new Schema({
         type: String,
         default: null
     },
+    bio: {
+        type: String,
+        default: ""
+    },
+    appearance: {
+        background: {
+            type: String,
+            default: '#808080'
+        },
+        profileTitle: {
+            type: String,
+            default: ''
+        },
+        buttons: {
+            fontColor: {
+                type: String,
+                default: 'black'
+            },
+            color: {
+                type: String,
+                default: 'white'
+            },
+            shadowColor: {
+                type: String,
+                default: 'black'
+            },
+            design : {
+                type: String,
+                default: 'rectangle-fill'
+            }
+        },
+        font: {
+            fontColor: {
+                type: String,
+                default: 'white'
+            },
+            fontFamily: {
+                type: String,
+                default: 'inter'
+            }
+        }
+    },
     // linksData: {
     //     type: parentSchema,
     //     default: {}
@@ -121,7 +163,7 @@ userSchema.statics.signup = async function (firstName, lastName, email, password
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt)
 
-    const user = await this.create({ firstName, lastName, email, password: hash, username, profilePicture }) // add profile pic
+    const user = await this.create({ firstName, lastName, email, password: hash, username, profilePicture  }) // add profile pic
     return user
 }
 

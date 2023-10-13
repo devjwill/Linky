@@ -25,7 +25,7 @@ const AdminNavbar = ({ user, admin, windowWidth, page, setPage }) => {
                 <div className='flex items-center gap-8'>
                     <button className='border border-solid border-1 border-zinc-300 rounded-full shadow-md shadow-neutral-300 hover:shadow-neutral-400 flex items-center gap-1 py-2.5 px-5 font-medium text-lg'><FaShareNodes className='inline' color='303030' size="20"/>Share</button>
                     <div className=''>
-                        {admin && admin.profilePicture ? <img src={admin.profilePicture} className='rounded-full w-14'/> : <FaCircleUser color='737373' size={56}/>}
+                        {admin && admin.user.profilePicture ? <img src={admin.user.profilePicture} className='rounded-full w-14'/> : <FaCircleUser color='737373' size={56}/>}
                     </div>
                 </div>
             </nav>
@@ -53,7 +53,7 @@ const AdminNavbar = ({ user, admin, windowWidth, page, setPage }) => {
                 <div className='flex items-center gap-8'>
                     {windowWidth > 425 && <button className='border border-solid border-1 border-zinc-300 rounded-full shadow-md shadow-neutral-300 hover:shadow-neutral-400 flex items-center gap-1 py-2.5 px-5 font-medium text-lg'><FaShareNodes className='inline' color='303030' size="20"/>Share</button>}
                     <div className=''>
-                        {admin && admin.profilePicture ? <img src={admin.profilePicture} className='rounded-full w-14'/> : <FaCircleUser color='737373' size={56}/>}
+                        {admin && admin.user.profilePicture ? <img src={admin.profilePicture} className='rounded-full w-14'/> : <FaCircleUser color='737373' size={56}/>}
                     </div>
                 </div>
             </nav>

@@ -1,6 +1,7 @@
 1. different name validation for signup in frontend and backend
 2. Finish Navbar (condition rendering with the login and sign in, profile pic or user when signed in)
 3. finish home page
+4.when adding a new link it gets added to the end of the array instead of the begining
 
 
 
@@ -8,3 +9,8 @@ set profile picture button
 
 POTENTIAL PROBLEMS
 -some alphabets not recognized for names, case insensitive for usernames (ayedev, ayedev) signup
+
+
+
+refresh invalid hex code ❓
+start and finish fonts
