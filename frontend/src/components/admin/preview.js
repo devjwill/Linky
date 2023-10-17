@@ -44,19 +44,19 @@ const Preview = ({ admin }) => {
 
     const containerStyles = (background) => {
         if (background[0] === "#" && background.length <= 7) { //solid color
-            return { background: `${background}`, fontFamily: `${admin.user.appearance.font.fontFamily}` }
+            return { background: `${background}` }
         } else if (background[0] === "#" && background.length > 7) { //gradient
             const colorsArr = background.split(" ")
             const color1 = colorsArr[0]
             const color2 = colorsArr[1]
             const gradientDirection = colorsArr[2]
             if (gradientDirection === 'up' || !gradientDirection) {
-                return { backgroundImage: `linear-gradient(to top, ${color1}, ${color2})`, fontFamily: `${admin.user.appearance.font.fontFamily}`}
+                return { backgroundImage: `linear-gradient(to top, ${color1}, ${color2})` }
             } else if (gradientDirection === 'down') {
-                return { backgroundImage: `linear-gradient(to bottom, ${color1}, ${color2})`, fontFamily: `${admin.user.appearance.font.fontFamily}` }
+                return { backgroundImage: `linear-gradient(to bottom, ${color1}, ${color2})` }
             }
         } else { //image
-            return { backgroundImage: `url(${images[images.findIndex((item) => item.name === admin.user.appearance.background)].url})`, backgroundPosition: 'center', backgroundSize: 'cover', fontFamily: `${admin.user.appearance.font.fontFamily}` }
+            return { backgroundImage: `url(${images[images.findIndex((item) => item.name === admin.user.appearance.background)].url})`, backgroundPosition: 'center', backgroundSize: 'cover' }
         }
     }
 
@@ -100,10 +100,10 @@ const Preview = ({ admin }) => {
     return (
         <div className="w-1/3 py-20 px-36 lg:px-28 md:px-20 kdi:px-11 sm:px-3 idk:px-1 flex justify-center">
             <div className='w-full h-full rounded-[40px] border border-4 border-solid border-zinc-500 p-2 bg-black'>
-                <div className='flex flex-col items-center w-full h-full rounded-[30px] p-6' style={containerStyles(admin.user.appearance.background)}>
+                <div className={`flex flex-col items-center w-full h-full rounded-[30px] p-6 font-${admin.user.appearance.font.fontFamily}`} style={containerStyles(admin.user.appearance.background)}>
                     <div className='flex flex-col items-center gap-2 mb-5'>
                         <img src={admin.user.profilePicture} className='rounded-full w-28 '></img>
-                        <h1 className='font-bold text-xl' style={{color: `${admin.user.appearance.font.fontColor}`}}>{admin.user.appearance.profileTitle}</h1>
+                        <h1 className="font-bold text-xl" style={{color: `${admin.user.appearance.font.fontColor}`}}>{admin.user.appearance.profileTitle}</h1>
                         <p className="text-white">{admin.user.bio}</p>
                     </div>
                     <div className='flex flex-col items-center gap-3'>

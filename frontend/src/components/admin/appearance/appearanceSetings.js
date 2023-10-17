@@ -273,6 +273,27 @@ const ApperanceSettings = ({ admin, dispatch, windowWidth, windowHeight }) => {
         }
     }
 
+    const editFontFamily = async (username, fontFamily) => {
+        if (username && fontFamily && fontFamily !== admin.user.appearance.font.fontFamily) {
+            const response = await fetch('/api/admin/patch', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${user.token}`
+                },
+                body: JSON.stringify({username, fontFamily})
+            })
+            
+            const json = await response.json()
+
+            if (!response.ok) {
+                console.log(json.error)
+            } else if (response.ok) {
+                dispatch({type: 'EDIT_FONT_FAMILY', payload: json})
+            }
+        }
+    }
+
     useEffect(() => { 
         if (backgrounds[activeIndex].design[0] === "#") { //updated bacgrounds is either solid or gradient
             changeBackground(admin.user.username, backgrounds[activeIndex].design)
@@ -806,43 +827,54 @@ const ApperanceSettings = ({ admin, dispatch, windowWidth, windowHeight }) => {
             <div className="flex flex-col gap-5">
                 <h1 className="text-3xl font-bold">Fonts</h1>
                 <div className="flex flex-col border border-solid border-black rounded-md bg-white p-5">
-                    <div>
-                        <p className="font-medium">Font</p>
+                    <div className="">
+                        <p className="font-medium mb-2">Font</p>
                         <div className="flex gap-6 items-center border border-solid border-neutral-400 rounded-md p-7">
-                            <div className="border border-solid border-neutral-300 rounded-md p-5">
-                                <p className="font-bold text-xl">Aa</p>
+                            <div className="border border-solid border-neutral-400 rounded-md p-5">
+                                <p className={`font-${admin.user.appearance.font.fontFamily} font-bold text-xl`}>Aa</p>
                             </div>
-                            <div className="flex justify-evenly">
-                                <div>
-                                    <button className="font-bold text-xl">Inter</button>
+                            <div className="w-full flex justify-items-center justify-evenly flex-wrap gap-3 "> 
+                            {/* Inter✅, Pixelify✅, Bebas Neue✅, Autour One✅, Dancing Script✅, IBM Plex Mono✅, Rajdhani, Caveat✅, Indie Flower✅, Bangers*/}
+                                <div className={`border border-solid ${admin.user.appearance.font.fontFamily === 'inter' ? 'border-black hover:cursor-default' : 'border-stone-400 hover:cursor-pointer'} border-1 rounded-md p-2`} onClick={() => editFontFamily(admin.user.username, 'inter')}>
+                                    <p className="font-bold text-xl">Inter</p>
                                 </div>
-                                <div>
-                                    <button className="font-bold text-xl">Inter</button>
+                                <div className={`border border-solid ${admin.user.appearance.font.fontFamily === 'bebas-neue' ? 'border-black hover:cursor-default' : 'border-stone-400 hover:cursor-pointer'} border-1 rounded-md p-2`} onClick={() => editFontFamily(admin.user.username, 'bebas-neue')}>
+                                    <p className="font-bebas-neue font-bold text-xl">Bebas Neue</p>
                                 </div>
-                                <div>
-                                    <button className="font-bold text-xl">Inter</button>
+                                <div className={`border border-solid ${admin.user.appearance.font.fontFamily === 'dancing-script' ? 'border-black hover:cursor-default' : 'border-stone-400 hover:cursor-pointer'} border-1 rounded-md p-2`} onClick={() => editFontFamily(admin.user.username, 'dancing-script')}>
+                                    <p className="font-dancing-script font-bold text-xl">Dancing Script</p>
                                 </div>
-                                <div>
-                                    <button className="font-bold text-xl">Inter</button>
+                                <div className={`border border-solid ${admin.user.appearance.font.fontFamily === 'bangers' ? 'border-black hover:cursor-default' : 'border-stone-400 hover:cursor-pointer'} border-1 rounded-md p-2`} onClick={() => editFontFamily(admin.user.username, 'bangers')}>
+                                    <p className="font-bangers font-bold text-xl">Bangers</p>
                                 </div>
-                                <div>
-                                    <button className="font-bold text-xl">Inter</button>
+                                <div className={`border border-solid ${admin.user.appearance.font.fontFamily === 'pixelify' ? 'border-black hover:cursor-default' : 'border-stone-400 hover:cursor-pointer'} border-1 rounded-md p-2`} onClick={() => editFontFamily(admin.user.username, 'pixelify')}>
+                                    <p className="font-pixelify font-bold text-xl">Pixelify</p>
                                 </div>
-                                <div>
-                                    <button className="font-bold text-xl">Inter</button>
+                                <div className={`border border-solid ${admin.user.appearance.font.fontFamily === 'autour-one' ? 'border-black hover:cursor-default' : 'border-stone-400 hover:cursor-pointer'} border-1 rounded-md p-2`} onClick={() => editFontFamily(admin.user.username, 'autour-one')}>
+                                    <p className="font-autour-one font-bold text-xl">Autour One</p>
                                 </div>
-                                <div>
-                                    <button className="font-bold text-xl">Inter</button>
+                                <div className={`border border-solid ${admin.user.appearance.font.fontFamily === 'ibm-plex-mono' ? 'border-black hover:cursor-default' : 'border-stone-400 hover:cursor-pointer'} border-1 rounded-md p-2`} onClick={() => editFontFamily(admin.user.username, 'ibm-plex-mono')}>
+                                    <p className="font-ibm-plex-mono font-bold text-xl">IBM Plex Mono</p>
                                 </div>
-                                <div>
-                                    <button className="font-bold text-xl">Inter</button>
+                                <div className={`border border-solid ${admin.user.appearance.font.fontFamily === 'caveat' ? 'border-black hover:cursor-default' : 'border-stone-400 hover:cursor-pointer'} border-1 rounded-md p-2`} onClick={() => editFontFamily(admin.user.username, 'caveat')}>
+                                    <p className="font-caveat font-bold text-xl">Caveat</p>
                                 </div>
-                                <div>
-                                    <button className="font-bold text-xl">Inter</button>
+                                <div className={`border border-solid ${admin.user.appearance.font.fontFamily === 'indie-flower' ? 'border-black hover:cursor-default' : 'border-stone-400 hover:cursor-pointer'} border-1 rounded-md p-2`} onClick={() => editFontFamily(admin.user.username, 'indie-flower')}>
+                                    <p className="font-indie-flower font-bold text-xl">Indie Flower</p>
                                 </div>
-                                <div>
-                                    <button className="font-bold text-xl">Inter</button>
+                                <div className={`border border-solid ${admin.user.appearance.font.fontFamily === 'bodoni-moda' ? 'border-black hover:cursor-default' : 'border-stone-400 hover:cursor-pointer'} border-1 rounded-md p-2`} onClick={() => editFontFamily(admin.user.username, 'bodoni-moda')}>
+                                    <p className="font-bodoni-moda font-bold text-xl">Bodoni Moda</p>
                                 </div>
+                                {/* <button className="font-bold text-xl">Intefdafsdfasdr</button>
+                                <button className="font-bold text-xl">asdffasdfasdfa</button>
+                                <button className="font-bold text-xl">Intfdasfasder</button>
+                                <button className="font-bold text-xl">Intfdafsder</button>
+                                <button className="font-bold text-xl">dfasdfasdf</button>
+                                <button className="font-bold text-xl">Inter</button>
+                                <button className="font-bold text-xl">Inter</button>
+                                <button className="font-bold text-xl">Inter</button>
+                                <button className="font-bold text-xl">Intdfdsafsder</button>
+                                <button className="font-bold text-xl">fdasfasdfasdf</button> */}
                             </div>
                         </div>
                     </div>

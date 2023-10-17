@@ -174,6 +174,23 @@ export const adminReducer = (state, action) => {
                     }
                 } 
             }
+            case 'EDIT_FONT_FAMILY': {
+                return {
+                    admin: {
+                        ...state.admin,
+                        user: {
+                            ...state.admin.user,
+                            appearance: {
+                                ...state.admin.user.appearance,
+                                font: {
+                                    ...state.admin.user.appearance.font,
+                                    fontFamily: action.payload
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         default:
             return state
     }

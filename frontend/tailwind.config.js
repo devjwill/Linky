@@ -25,7 +25,16 @@ module.exports = {
         'white': '#FFFFFF'
       },
       fontFamily: {
-        'sans': ['Inter', 'ui-sans-serif', 'system-ui']
+        'sans': [ 'Inter', 'ui-sans-serif', 'system-ui'],
+        'bebas-neue': [ 'Bebas Neue', 'ui-sans-serif', 'system-ui'],
+        'dancing-script': ['Dancing Script', 'ui-sans-serif', 'system-ui'],
+        'bangers': ['Bangers', 'ui-sans-serif', 'system-ui'],
+        'pixelify': ['Pixelify Sans', 'ui-sans-serif', 'system-ui'],
+        'autour-one': ['Autour One', 'ui-sans-serif', 'system-ui'],
+        'ibm-plex-mono': ['IBM Plex Mono', 'ui-sans-serif', 'system-ui'],
+        'caveat': ['Caveat', 'ui-sans-serif', 'system-ui'],
+        'indie-flower': ['Indie Flower', 'ui-sans-serif', 'system-ui'],
+        'bodoni-moda': ['Bodoni Moda', 'ui-sans-serif', 'system-ui'],
       },
       keyframes: {
         wiggle: {

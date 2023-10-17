@@ -301,6 +301,15 @@ const patch = async (req, res) => {
       } else {
         res.status(400).json({error: 'Failed to make change to button font color'})
       }
+    } else if (req.body.username && req.body.fontFamily) { //Edit font family
+      const { username, fontFamily } = req.body
+      const updatedFontFamily = await User.findOneAndUpdate({ username }, { $set: { "appearance.font.fontFamily": fontFamily } }, { returnOriginal: false })
+
+      if (updatedFontFamily) {
+        res.status(200).json(updatedFontFamily.appearance.font.fontFamily)
+      } else {
+        res.status(400).json({error: 'Failed to make change to font family'})
+      }
     }
 }
 
