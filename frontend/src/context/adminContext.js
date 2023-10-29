@@ -191,6 +191,80 @@ export const adminReducer = (state, action) => {
                     }
                 }
             }
+            case 'EDIT_FONT_COLOR': {
+                return {
+                    admin: {
+                        ...state.admin,
+                        user: {
+                            ...state.admin.user,
+                            appearance: {
+                                ...state.admin.user.appearance,
+                                font: {
+                                    ...state.admin.user.appearance.font,
+                                    fontColor: action.payload
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            case 'EDIT_FIRST_NAME': {
+                return {
+                    admin : {
+                        ...state.admin,
+                        user: {
+                            ...state.admin.user,
+                            firstName: action.payload
+                        }   
+                    }
+                }
+            }
+            case 'EDIT_LAST_NAME': {
+                return {
+                    admin: {
+                        ...state.admin,
+                        user: {
+                            ...state.admin.user,
+                            lastName: action.payload
+                        }    
+                    }
+
+                }
+            }
+            case 'EDIT_EMAIL': {
+                return {
+                    admin: {
+                        ...state.admin,
+                        user: {
+                            ...state.admin.user,
+                            email: action.payload
+                        }   
+                    }
+
+                } 
+            }
+            case 'EDIT_USERNAME': {
+                return {
+                    admin: {
+                        ...state.admin,
+                        user: {
+                            ...state.admin.user,
+                            username: action.payload
+                        }
+                    }
+                }
+            }
+            case 'CHANGE_PASSWORD': {
+                return {
+                    admin: {
+                        ...state.admin,
+                        user: {
+                            ...state.admin.user,
+                            password: action.payload
+                        }
+                    }
+                }
+            }
         default:
             return state
     }

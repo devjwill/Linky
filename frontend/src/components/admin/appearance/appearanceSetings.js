@@ -18,7 +18,8 @@ import Colorful from '@uiw/react-color-colorful'
 
 const ApperanceSettings = ({ admin, dispatch, windowWidth, windowHeight }) => {
     const { user } = useAuthContext()
-    const colors = ['#FF0000', '#FFA500', '#FFFF00', '#008000', '#0000FF', '#4B0082', '#9400D3']
+    // const colors = ['#FF0000', '#FFA500', '#FFFF00', '#008000', '#0000FF', '#4B0082', '#9400D3']
+    const colors = ['#dc2626', '#f97316', '#facc15', '#16a34a', '#1d4ed8', '#7e22ce', '#d946ef', '#713f12']
     const [backgrounds, setBackgrounds] = useState([{
         name: 'Solid',
         type: 'color',
@@ -294,6 +295,27 @@ const ApperanceSettings = ({ admin, dispatch, windowWidth, windowHeight }) => {
         }
     }
 
+    const editFontColor = async (username, fontColor) => {
+        if (username && fontColor && fontColor !== admin.user.appearance.font.fontColor) {
+            const response = await fetch('/api/admin/patch', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${user.token}`
+                },
+                body: JSON.stringify({username, fontColor})
+            })
+
+            const json = await response.json()
+
+            if (!response.ok) {
+                console.log(json.error)
+            } else if (response.ok) {
+                dispatch({type:'EDIT_FONT_COLOR', payload: json})
+            }
+        }
+    }
+
     useEffect(() => { 
         if (backgrounds[activeIndex].design[0] === "#") { //updated bacgrounds is either solid or gradient
             changeBackground(admin.user.username, backgrounds[activeIndex].design)
@@ -453,16 +475,19 @@ const ApperanceSettings = ({ admin, dispatch, windowWidth, windowHeight }) => {
     }, [profileTitle])
 
     useEffect(() => { //updates background example when change color
-        const updatedBackgrounds = backgrounds
-        updatedBackgrounds[0].design = bgColor
-        setBackgrounds(updatedBackgrounds)
+        if (windowWidth >= 480) {
+            const updatedBackgrounds = backgrounds
+            updatedBackgrounds[0].design = bgColor
+            setBackgrounds(updatedBackgrounds) 
+        }
     }, [bgColor])
 
     useEffect(() => { // updates background example when change gradient
-        const updatedBackgrounds = backgrounds
-        updatedBackgrounds[1].design = `${bgGradient.split(" ")[0]} ${bgGradient.split(" ")[1]} ${gradientDirection}`
-        setBackgrounds(updatedBackgrounds)
-
+        if (windowWidth >= 480) {
+            const updatedBackgrounds = backgrounds
+            updatedBackgrounds[1].design = `${bgGradient.split(" ")[0]} ${bgGradient.split(" ")[1]} ${gradientDirection}`
+            setBackgrounds(updatedBackgrounds)  
+        }
     }, [bgGradient])
 
     const dynamicStyles = (item) => {
@@ -531,8 +556,21 @@ const ApperanceSettings = ({ admin, dispatch, windowWidth, windowHeight }) => {
         }
     }
 
-    const handleTest = () => {
-        console.log('handle test button')
+    const handleSolidBg = (color) => {
+        const updatedBackgrounds = backgrounds
+        updatedBackgrounds[0].design = color
+        setBackgrounds(updatedBackgrounds)
+        setBgColor(color)
+        changeBackground(admin.user.username, color)
+        // console.log('change bgColor: ' + backgrounds[0].design)
+    }
+
+    const handleGradientBg = (color1, color2) => {
+        const updatedBackgrounds = backgrounds
+        updatedBackgrounds[1].design = color1 + " " + color2
+        setBackgrounds(updatedBackgrounds)
+        setBgGradient(color1 + " " + color2)
+        changeBackground(admin.user.username, color1 + " " + color2 + " " + gradientDirection)
     }
 
     const handleMouseUp = (name) => {
@@ -569,7 +607,6 @@ const ApperanceSettings = ({ admin, dispatch, windowWidth, windowHeight }) => {
         <div className="flex flex-col gap-20">
             <div className="flex flex-col gap-5">
                 <h1 className="text-3xl font-bold">Profile</h1>
-                <button className="bg-blue-500 p-2 rounded-md text-white font-bold" onClick={handleTest}>Test me</button>
                 <div className="flex flex-col gap-10 w-full border border-solid border-black border-1 rounded-md shadow-2xl bg-white p-5">
                     {!admin.user.profilePicture && 
                     <div className="flex gap-5">
@@ -608,18 +645,19 @@ const ApperanceSettings = ({ admin, dispatch, windowWidth, windowHeight }) => {
             <div className="flex flex-col gap-5">
                 <h1 className="text-3xl font-bold">Backgrounds {windowWidth}</h1>
                 <div className="w-full h-auto border border-solid border-black border-1 rounded-md shadow-2xl bg-white p-5">
-                    <div className="w-full h-full inline-grid grid-cols-[repeat(auto-fill,_minmax(135px,_1fr))] gap-5 items-baseline">
+                    <div className="w-full h-full inline-grid idk:grid-cols-[repeat(auto-fill,_minmax(135px,_1fr))] xs:grid-cols-[repeat(auto-fill,_minmax(100px,_1fr))] xxs:grid-cols-[repeat(auto-fill,_minmax(85px,_1fr))] xxxxs:grid-cols-[repeat(auto-fill,_minmax(55px,_1fr))] gap-5 items-baseline">
                         {backgrounds.map((item, index) => (
                             <div key={item.name} className="hover:cursor-pointer h-full flex flex-col items-center justify-self-center " style={active(index)} onClick={() => handleBackgroundChange(index)}>
-                                <div className="w-[130px] h-[175px] rounded-md" style={dynamicStyles(item)}></div>
+                                <div className="w-[130px] h-[175px] xs:w-[95px] xs:h-[140px] xxs:w-[80px] xxs:h-[125px] xxxxs:w-[50px] xxxxs:h-[95px] rounded-md" style={dynamicStyles(item)}></div>
                                 <p className="text-center font-medium">{item.name}</p>
                             </div>
                         ))}
                     </div>
-                    {activeIndex === 0 &&
+                    {activeIndex === 0 && windowWidth >= 480 &&
                     <div className="mt-10 border-t border-t-solid border-t-stone-400 border-t-1 pt-5">
-                        <p className="font-medium text-lg mb-2.5">Color</p>
-                        <div className="flex gap-5 items-center justify-evenly">
+                        <p className="font-medium text-lg mb-2.5">Color {windowWidth}</p>
+                        <div className="flex flex-wrap gap-5 items-center justify-evenly">
+                            {/* no color picker on screens less than 350px */}
                             <div id="colorPicker" className="bg-[#D9D9D9] p-3 rounded-md flex items-center" onMouseUp={() => handleMouseUp('solid')}>
                                 <Colorful color={bgColor} disableAlpha={true}  onChange={(color) => {setBgColor(color.hex)}} className="border border-solid solid-black border-5" ref={colorPicker}/>
                             </div>
@@ -630,27 +668,51 @@ const ApperanceSettings = ({ admin, dispatch, windowWidth, windowHeight }) => {
                             </div>
                         </div>
                     </div>}
-                    {activeIndex === 1 &&
+                    {activeIndex === 0 && windowWidth < 480 &&
+                    <div className="flex flex-col gap-1.5 mt-10 border-t border-t-solid border-t-stone-400 border-t-1 pt-5">
+                        <p className="font-medium">Background Color</p>
+                        <div className="flex xs:flex-row xs:gap-5 xxxxs:flex-col">
+                            <div className="xs:w-24 xs:h-24 xxxxs:w-full xxxxs:h-14 bg-[#D9D9D9] p-2 xs:rounded-md xxxxs:rounded-t-md">
+                                <div className="w-full h-full rounded-md" style={{backgroundColor: admin.user.appearance.background}}></div> {/*  */}
+                            </div>
+                            <div className="flex flex-col bg-[#D9D9D9] p-1.5 xs:rounded-md xs:border-none xxxxs:rounded-b-md xxxxs:border xxxxs:border-solid xxxxs:border-t-neutral-400">
+                                <p className="font-medium">Button Color</p>
+                                <div className="flex flex-wrap gap-3">
+                                    <div className={`h-7 w-7 bg-red-600 border-solid border-2 ${admin.user.appearance.background === '#dc2626' ? 'border-black' : 'border-red-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleSolidBg('#dc2626')}></div>
+                                    <div className={`h-7 w-7 bg-orange-500 border-solid border-2 ${admin.user.appearance.background === '#f97316' ? 'border-black' : 'border-orange-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleSolidBg('#f97316')}></div>
+                                    <div className={`h-7 w-7 bg-yellow-400 border-solid border-2 ${admin.user.appearance.background === '#facc15' ? 'border-black' : 'border-yellow-400 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleSolidBg('#facc15')}></div>
+                                    <div className={`h-7 w-7 bg-green-600 border-solid border-2 ${admin.user.appearance.background === '#16a34a' ? 'border-black' : 'border-green-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleSolidBg('#16a34a')}></div>
+                                    <div className={`h-7 w-7 bg-blue-700 border-solid border-2 ${admin.user.appearance.background === '#1d4ed8' ? 'border-black' : 'border-blue-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleSolidBg('#1d4ed8')}></div>                                        
+                                    <div className={`h-7 w-7 bg-purple-700 border-solid border-2 ${admin.user.appearance.background === '#7e22ce' ? 'border-black' : 'border-purple-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleSolidBg('#7e22ce')}></div>
+                                    <div className={`h-7 w-7 bg-fuchsia-500 border-solid border-2 ${admin.user.appearance.background === '#d946ef' ? 'border-black' : 'border-fuchsia-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleSolidBg('#d946ef')}></div>
+                                    <div className={`h-7 w-7 bg-yellow-900 border-solid border-2 ${admin.user.appearance.background === '#713f12' ? 'border-black' : 'border-yellow-900 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleSolidBg('#713f12')}></div>
+                                    <div className={`h-7 w-7 bg-black border-solid border-2 ${admin.user.appearance.background === '#000000' ? 'border-neutral-500' : 'border-black hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleSolidBg('#000000')}></div>
+                                    <div className={`h-7 w-7 bg-white border-solid border-2 ${admin.user.appearance.background === '#FFFFFF' ? 'border-black' : 'border-white hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleSolidBg('#FFFFFF')}></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>}
+                    {activeIndex === 1 && windowWidth >= 480 &&
                     <div className="mt-10 border-t border-t-solid border-t-stone-400 border-t-1 pt-5">
-                        <p className="font-medium text-lg mb-2.5">Color</p>
-                        <div className="flex justify-evenly mb-5">
-                            <div className="flex flex-col gap-5">
-                                <div id="gradientPicker1" className="bg-[#D9D9D9] p-3 rounded-md" onMouseUp={() => handleMouseUp("gradient")}>
+                        <p className="font-medium text-lg mb-2.5">Color {windowWidth}</p>
+                        <div className="flex gap-8 justify-evenly mb-5 flex-wrap">
+                            <div className={`flex flex-col ${windowWidth >= 635 && 'gap-5'}`}>
+                                <div id="gradientPicker1" className={`bg-[#D9D9D9] p-3 ${windowWidth >= 635 ? 'rounded-md' : 'rounded-t-md'}`} onMouseUp={() => handleMouseUp("gradient")}>
                                     <p>Gradient Color #1</p>
                                     <Colorful color={bgGradient.split(" ")[0]} disableAlpha={true} onChange={(color) => {setBgGradient(`${color.hex} ${bgGradient.split(" ")[1]}`)}} ref={gradientPicker1}/>
                                 </div>
-                                <div ref={bgGradientRef1} className="flex flex-col bg-[#D9D9D9] p-1.5 rounded-md" style={editingStyles("bgGradient1")} onClick={() => handleDivClick('bgGradient1')}>
+                                <div ref={bgGradientRef1} className={`flex flex-col bg-[#D9D9D9] p-1.5 ${windowWidth >= 635 ? 'rounded-md' : 'rounded-b-md border border-solid border-t-neutral-400'}`} style={editingStyles("bgGradient1")} onClick={() => handleDivClick('bgGradient1')}>
                                     <p className="text-[#8F8F8F]">Color</p>
                                     <input type="text" id="bgGradient1" maxLength={7} className="!outline-none bg-transparent uppercase" value={bgGradient.split(" ")[0]} onChange={(e) => setBgGradient(`${e.target.value} ${bgGradient.split(" ")[1]}`)}></input>
                                     {/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(bgGradient.split(" ")[0]) === false && <p className="text-red-500 font-bold">Invalid Color</p>}
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-5"> 
-                                <div id="gradientPicker2" className="bg-[#D9D9D9] p-3 rounded-md" onMouseUp={() => handleMouseUp("gradient")}>
+                            <div className={`flex flex-col ${windowWidth >= 635 && 'gap-5'}`}> 
+                                <div id="gradientPicker2" className={`bg-[#D9D9D9] p-3 ${windowWidth >= 635 ? 'rounded-md' : 'rounded-t-md'}`} onMouseUp={() => handleMouseUp("gradient")}>
                                     <p>Gradient Color #2</p>
                                     <Colorful color={`${bgGradient.split(" ")[1]}`} disableAlpha={true} onChange={(color) => {setBgGradient(`${bgGradient.split(" ")[0]} ${color.hex}`)}} ref={gradientPicker2}/>
                                 </div>
-                                <div ref={bgGradientRef2} className="flex flex-col bg-[#D9D9D9] p-1.5 rounded-md" style={editingStyles('bgGradient2')} onClick={() => handleDivClick('bgGradient2')}>
+                                <div ref={bgGradientRef2} className={`flex flex-col bg-[#D9D9D9] p-1.5 ${windowWidth >= 635 ? 'rounded-md' : 'rounded-b-md border border-solid border-t-neutral-400'}`} style={editingStyles('bgGradient2')} onClick={() => handleDivClick('bgGradient2')}>
                                     <p className="text-[#8F8F8F]">Color</p>
                                     <input type="text" id="bgGradient2" maxLength={7} className="!outline-none bg-transparent uppercase" value={`${bgGradient.split(" ")[1]}`} onChange={(e) => setBgGradient(`${bgGradient.split(" ")[0]} ${e.target.value}`)}></input>
                                     {/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(bgGradient.split(" ")[1]) === false && <p className="text-red-500 font-bold">Invalid Color</p>}
@@ -671,6 +733,62 @@ const ApperanceSettings = ({ admin, dispatch, windowWidth, windowHeight }) => {
                                         <button className={`${gradientDirection === 'down' && 'bg-neutral-500'} w-full h-full rounded-full hover:bg-neutral-400`} ></button>
                                     </div>
                                     <p>Gradient Down</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>}
+                    {activeIndex === 1 && windowWidth < 480 &&
+                     <div className="flex flex-col gap-1.5 mt-10 border-t border-t-solid border-t-stone-400 border-t-1 pt-6">
+                        <p className="font-medium">Background Color</p>
+                        <div className="flex xs:flex-row xs:gap-5 xxxxs:flex-col">
+                            <div className="xs:w-24 xs:h-24 xxxxs:w-full xxxxs:h-14 bg-[#D9D9D9] p-2 xs:rounded-md xxxxs:rounded-t-md">
+                                <div className="w-full h-full rounded-md" style={dynamicStyles(backgrounds[1])}></div> {/*  */}
+                            </div>
+                            <div className="flex flex-col bg-[#D9D9D9] p-1.5 xs:rounded-md xs:border-none xxxxs:rounded-b-md xxxxs:border xxxxs:border-solid xxxxs:border-t-neutral-400">
+                                <p className="font-medium">Gradient #1</p>
+                                <div className="flex flex-wrap gap-3">
+                                    <div className={`h-7 w-7 bg-red-600 border-solid border-2 ${admin.user.appearance.background.split(" ")[0] === '#dc2626' ? 'border-black' : 'border-red-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg('#dc2626', admin.user.appearance.background.split(" ")[1])}></div>
+                                    <div className={`h-7 w-7 bg-orange-500 border-solid border-2 ${admin.user.appearance.background.split(" ")[0] === '#f97316' ? 'border-black' : 'border-orange-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg('#f97316', admin.user.appearance.background.split(" ")[1])}></div>
+                                    <div className={`h-7 w-7 bg-yellow-400 border-solid border-2 ${admin.user.appearance.background.split(" ")[0] === '#facc15' ? 'border-black' : 'border-yellow-400 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg('#facc15', admin.user.appearance.background.split(" ")[1])}></div>
+                                    <div className={`h-7 w-7 bg-green-600 border-solid border-2 ${admin.user.appearance.background.split(" ")[0] === '#16a34a' ? 'border-black' : 'border-green-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg('#16a34a', admin.user.appearance.background.split(" ")[1])}></div>
+                                    <div className={`h-7 w-7 bg-blue-700 border-solid border-2 ${admin.user.appearance.background.split(" ")[0] === '#1d4ed8' ? 'border-black' : 'border-blue-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg('#1d4ed8', admin.user.appearance.background.split(" ")[1])}></div>                                        
+                                    <div className={`h-7 w-7 bg-purple-700 border-solid border-2 ${admin.user.appearance.background.split(" ")[0] === '#7e22ce' ? 'border-black' : 'border-purple-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg('#7e22ce', admin.user.appearance.background.split(" ")[1])}></div>
+                                    <div className={`h-7 w-7 bg-fuchsia-500 border-solid border-2 ${admin.user.appearance.background.split(" ")[0] === '#d946ef' ? 'border-black' : 'border-fuchsia-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg('#d946ef', admin.user.appearance.background.split(" ")[1])}></div>
+                                    <div className={`h-7 w-7 bg-yellow-900 border-solid border-2 ${admin.user.appearance.background.split(" ")[0] === '#713f12' ? 'border-black' : 'border-yellow-900 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg('#713f12', admin.user.appearance.background.split(" ")[1])}></div>
+                                    <div className={`h-7 w-7 bg-black border-solid border-2 ${admin.user.appearance.background.split(" ")[0] === '#000000' ? 'border-neutral-500' : 'border-black hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg('#000000', admin.user.appearance.background.split(" ")[1])}></div>
+                                    <div className={`h-7 w-7 bg-white border-solid border-2 ${admin.user.appearance.background.split(" ")[0] === '#FFFFFF' ? 'border-black' : 'border-white hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg('#FFFFFF', admin.user.appearance.background.split(" ")[1])}></div>
+                                </div>
+                            </div>
+                            <div className="mb-5 flex flex-col bg-[#D9D9D9] p-1.5 xs:rounded-md xs:border-none xxxxs:rounded-b-md xxxxs:border xxxxs:border-solid xxxxs:border-t-neutral-400">
+                                <p className="font-medium">Gradient #2</p>
+                                <div className="flex flex-wrap gap-3">
+                                    <div className={`h-7 w-7 bg-red-600 border-solid border-2 ${admin.user.appearance.background.split(" ")[1] === '#dc2626' ? 'border-black' : 'border-red-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg(admin.user.appearance.background.split(" ")[0], '#dc2626')}></div>
+                                    <div className={`h-7 w-7 bg-orange-500 border-solid border-2 ${admin.user.appearance.background.split(" ")[1] === '#f97316' ? 'border-black' : 'border-orange-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg(admin.user.appearance.background.split(" ")[0], '#f97316')}></div>
+                                    <div className={`h-7 w-7 bg-yellow-400 border-solid border-2 ${admin.user.appearance.background.split(" ")[1] === '#facc15' ? 'border-black' : 'border-yellow-400 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg(admin.user.appearance.background.split(" ")[0], '#facc15')}></div>
+                                    <div className={`h-7 w-7 bg-green-600 border-solid border-2 ${admin.user.appearance.background.split(" ")[1] === '#16a34a' ? 'border-black' : 'border-green-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg(admin.user.appearance.background.split(" ")[0], '#16a34a')}></div>
+                                    <div className={`h-7 w-7 bg-blue-700 border-solid border-2 ${admin.user.appearance.background.split(" ")[1] === '#1d4ed8' ? 'border-black' : 'border-blue-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg(admin.user.appearance.background.split(" ")[0], '#1d4ed8')}></div>                                        
+                                    <div className={`h-7 w-7 bg-purple-700 border-solid border-2 ${admin.user.appearance.background.split(" ")[1] === '#7e22ce' ? 'border-black' : 'border-purple-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg(admin.user.appearance.background.split(" ")[0], '#7e22ce')}></div>
+                                    <div className={`h-7 w-7 bg-fuchsia-500 border-solid border-2 ${admin.user.appearance.background.split(" ")[1] === '#d946ef' ? 'border-black' : 'border-fuchsia-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg(admin.user.appearance.background.split(" ")[0], '#d946ef')}></div>
+                                    <div className={`h-7 w-7 bg-yellow-900 border-solid border-2 ${admin.user.appearance.background.split(" ")[1] === '#713f12' ? 'border-black' : 'border-yellow-900 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg(admin.user.appearance.background.split(" ")[0], '#713f12')}></div>
+                                    <div className={`h-7 w-7 bg-black border-solid border-2 ${admin.user.appearance.background.split(" ")[1] === '#000000' ? 'border-neutral-500' : 'border-black hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg(admin.user.appearance.background.split(" ")[0], '#000000')}></div>
+                                    <div className={`h-7 w-7 bg-white border-solid border-2 ${admin.user.appearance.background.split(" ")[1] === '#FFFFFF' ? 'border-black' : 'border-white hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => handleGradientBg(admin.user.appearance.background.split(" ")[0], '#FFFFFF')}></div>
+                                </div>
+                            </div>
+                            <div>
+                                <p className="font-medium text-lg mb-2.5">Gradient</p>
+                                <div className="flex xxs:flex-row xxxxs:flex-col gap-5">
+                                    <div className="flex items-center gap-2">
+                                        <div className=" bg-[#D9D9D9] rounded-full w-8 h-8 p-1.5 hover:cursor-pointer" onClick={() => handleGradientDirectionChange('up')}>
+                                            <button className={`${gradientDirection === 'up' && 'bg-neutral-500'} w-full h-full rounded-full hover:bg-neutral-400`} ></button>
+                                        </div>
+                                        <p>Gradient Up</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="bg-[#D9D9D9] rounded-full w-8 h-8 p-1.5 hover:cursor-pointer" onClick={() => handleGradientDirectionChange('down')}>
+                                            <button className={`${gradientDirection === 'down' && 'bg-neutral-500'} w-full h-full rounded-full hover:bg-neutral-400`} ></button>
+                                        </div>
+                                        <p>Gradient Down</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -741,27 +859,23 @@ const ApperanceSettings = ({ admin, dispatch, windowWidth, windowHeight }) => {
                     <div className="flex flex-wrap justify-between gap-3">
                         <div className="flex flex-col gap-1.5">
                             <p className="font-medium">Button Color</p>
-                            <div className="flex gap-5">
-                                <div className="w-24 h-auto bg-[#D9D9D9] p-2 rounded-md">
+                            <div className="flex xs:flex-row xs:gap-5 xxxxs:flex-col">
+                                <div className="xs:w-24 xs:h-24 xxxxs:w-full xxxxs:h-14 bg-[#D9D9D9] p-2 xs:rounded-md xxxxs:rounded-t-md">
                                     <div className="w-full h-full rounded-md" style={{backgroundColor: admin.user.appearance.buttons.color}}></div> {/*  */}
                                 </div>
-                                <div className="flex flex-col bg-[#D9D9D9] p-1.5 rounded-md">
+                                <div className="flex flex-col bg-[#D9D9D9] p-1.5 xs:rounded-md xs:border-none xxxxs:rounded-b-md xxxxs:border xxxxs:border-solid xxxxs:border-t-neutral-400">
                                     <p className="font-medium">Button Color</p>
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex gap-3">
-                                            <div className={`h-7 w-7 bg-red-600 border-solid border-2 ${admin.user.appearance.buttons.color === '#dc2626' ? 'border-black' : 'border-red-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#dc2626')}></div>
-                                            <div className={`h-7 w-7 bg-orange-500 border-solid border-2 ${admin.user.appearance.buttons.color === '#f97316' ? 'border-black' : 'border-orange-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#f97316')}></div>
-                                            <div className={`h-7 w-7 bg-yellow-400 border-solid border-2 ${admin.user.appearance.buttons.color === '#facc15' ? 'border-black' : 'border-yellow-400 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#facc15')}></div>
-                                            <div className={`h-7 w-7 bg-green-600 border-solid border-2 ${admin.user.appearance.buttons.color === '#16a34a' ? 'border-black' : 'border-green-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#16a34a')}></div>
-                                            <div className={`h-7 w-7 bg-blue-700 border-solid border-2 ${admin.user.appearance.buttons.color === '#1d4ed8' ? 'border-black' : 'border-blue-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#1d4ed8')}></div>                                        
-                                        </div>
-                                        <div className="flex gap-3">
-                                            <div className={`h-7 w-7 bg-purple-700 border-solid border-2 ${admin.user.appearance.buttons.color === '#7e22ce' ? 'border-black' : 'border-purple-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#7e22ce')}></div>
-                                            <div className={`h-7 w-7 bg-fuchsia-500 border-solid border-2 ${admin.user.appearance.buttons.color === '#d946ef' ? 'border-black' : 'border-fuchsia-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#d946ef')}></div>
-                                            <div className={`h-7 w-7 bg-yellow-900 border-solid border-2 ${admin.user.appearance.buttons.color === '#713f12' ? 'border-black' : 'border-yellow-900 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#713f12')}></div>
-                                            <div className={`h-7 w-7 bg-black border-solid border-2 ${admin.user.appearance.buttons.color === 'black' ? 'border-neutral-500' : 'border-black hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, 'black')}></div>
-                                            <div className={`h-7 w-7 bg-white border-solid border-2 ${admin.user.appearance.buttons.color === 'white' ? 'border-black' : 'border-white hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, 'white')}></div>
-                                        </div>
+                                    <div className="flex flex-wrap gap-3">
+                                        <div className={`h-7 w-7 bg-red-600 border-solid border-2 ${admin.user.appearance.buttons.color === '#dc2626' ? 'border-black' : 'border-red-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#dc2626')}></div>
+                                        <div className={`h-7 w-7 bg-orange-500 border-solid border-2 ${admin.user.appearance.buttons.color === '#f97316' ? 'border-black' : 'border-orange-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#f97316')}></div>
+                                        <div className={`h-7 w-7 bg-yellow-400 border-solid border-2 ${admin.user.appearance.buttons.color === '#facc15' ? 'border-black' : 'border-yellow-400 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#facc15')}></div>
+                                        <div className={`h-7 w-7 bg-green-600 border-solid border-2 ${admin.user.appearance.buttons.color === '#16a34a' ? 'border-black' : 'border-green-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#16a34a')}></div>
+                                        <div className={`h-7 w-7 bg-blue-700 border-solid border-2 ${admin.user.appearance.buttons.color === '#1d4ed8' ? 'border-black' : 'border-blue-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#1d4ed8')}></div>                                        
+                                        <div className={`h-7 w-7 bg-purple-700 border-solid border-2 ${admin.user.appearance.buttons.color === '#7e22ce' ? 'border-black' : 'border-purple-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#7e22ce')}></div>
+                                        <div className={`h-7 w-7 bg-fuchsia-500 border-solid border-2 ${admin.user.appearance.buttons.color === '#d946ef' ? 'border-black' : 'border-fuchsia-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#d946ef')}></div>
+                                        <div className={`h-7 w-7 bg-yellow-900 border-solid border-2 ${admin.user.appearance.buttons.color === '#713f12' ? 'border-black' : 'border-yellow-900 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, '#713f12')}></div>
+                                        <div className={`h-7 w-7 bg-black border-solid border-2 ${admin.user.appearance.buttons.color === 'black' ? 'border-neutral-500' : 'border-black hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, 'black')}></div>
+                                        <div className={`h-7 w-7 bg-white border-solid border-2 ${admin.user.appearance.buttons.color === 'white' ? 'border-black' : 'border-white hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonColor(admin.user.username, 'white')}></div>
                                     </div>
                                 </div>
                             </div>
@@ -769,54 +883,46 @@ const ApperanceSettings = ({ admin, dispatch, windowWidth, windowHeight }) => {
                         {(admin.user.appearance.buttons.design.split("-")[0] === 'hardShadow' || admin.user.appearance.buttons.design.split("-")[0] === 'softShadow') && 
                         <div className="flex flex-col gap-1.5">
                             <p className="font-medium">Button Shadow Color</p>
-                            <div className="flex gap-5">
-                                <div className="w-24 h-auto bg-[#D9D9D9] p-2 rounded-md">
+                            <div className="flex xs:flex-row xs:gap-5 xxxxs:flex-col">
+                                <div className="xs:w-24 xs:h-24 xxxxs:w-full xxxxs:h-14 bg-[#D9D9D9] p-2 xs:rounded-md xxxxs:rounded-t-md">
                                     <div className="w-full h-full rounded-md" style={{backgroundColor: admin.user.appearance.buttons.shadowColor}}></div>
                                 </div>
-                                <div className="flex flex-col bg-[#D9D9D9] p-1.5 rounded-md">
-                                    <p className="font-medium">Button Color</p>
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex gap-3">
-                                            <div className={`h-7 w-7 bg-red-600 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#dc2626' ? 'border-black' : 'border-red-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#dc2626')}></div>
-                                            <div className={`h-7 w-7 bg-orange-500 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#f97316' ? 'border-black' : 'border-orange-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#f97316')}></div>
-                                            <div className={`h-7 w-7 bg-yellow-400 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#facc15' ? 'border-black' : 'border-yellow-400 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#facc15')}></div>
-                                            <div className={`h-7 w-7 bg-green-600 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#16a34a' ? 'border-black' : 'border-green-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#16a34a')}></div>
-                                            <div className={`h-7 w-7 bg-blue-700 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#1d4ed8' ? 'border-black' : 'border-blue-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#1d4ed8')}></div>                                        
-                                        </div>
-                                        <div className="flex gap-3">
-                                            <div className={`h-7 w-7 bg-purple-700 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#7e22ce' ? 'border-black' : 'border-purple-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#7e22ce')}></div>
-                                            <div className={`h-7 w-7 bg-fuchsia-500 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#d946ef' ? 'border-black' : 'border-fuchsia-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#d946ef')}></div>
-                                            <div className={`h-7 w-7 bg-yellow-900 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#713f12' ? 'border-black' : 'border-yellow-900 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#713f12')}></div>
-                                            <div className={`h-7 w-7 bg-black border-solid border-2 ${admin.user.appearance.buttons.shadowColor === 'black' ? 'border-neutral-500' : 'border-black hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, 'black')}></div>
-                                            <div className={`h-7 w-7 bg-white border-solid border-2 ${admin.user.appearance.buttons.shadowColor === 'white' ? 'border-black' : 'border-white hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, 'white')}></div>
-                                        </div>
+                                <div className="flex flex-col bg-[#D9D9D9] p-1.5 xs:rounded-md xs:border-none xxxxs:rounded-b-md xxxxs:border xxxxs:border-solid xxxxs:border-t-neutral-400">
+                                    <p className="font-medium">Button Color {windowWidth}</p>
+                                    <div className="flex flex-wrap gap-3">
+                                        <div className={`h-7 w-7 bg-red-600 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#dc2626' ? 'border-black' : 'border-red-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#dc2626')}></div>
+                                        <div className={`h-7 w-7 bg-orange-500 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#f97316' ? 'border-black' : 'border-orange-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#f97316')}></div>
+                                        <div className={`h-7 w-7 bg-yellow-400 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#facc15' ? 'border-black' : 'border-yellow-400 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#facc15')}></div>
+                                        <div className={`h-7 w-7 bg-green-600 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#16a34a' ? 'border-black' : 'border-green-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#16a34a')}></div>
+                                        <div className={`h-7 w-7 bg-blue-700 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#1d4ed8' ? 'border-black' : 'border-blue-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#1d4ed8')}></div>                                        
+                                        <div className={`h-7 w-7 bg-purple-700 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#7e22ce' ? 'border-black' : 'border-purple-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#7e22ce')}></div>
+                                        <div className={`h-7 w-7 bg-fuchsia-500 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#d946ef' ? 'border-black' : 'border-fuchsia-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#d946ef')}></div>
+                                        <div className={`h-7 w-7 bg-yellow-900 border-solid border-2 ${admin.user.appearance.buttons.shadowColor === '#713f12' ? 'border-black' : 'border-yellow-900 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, '#713f12')}></div>
+                                        <div className={`h-7 w-7 bg-black border-solid border-2 ${admin.user.appearance.buttons.shadowColor === 'black' ? 'border-neutral-500' : 'border-black hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, 'black')}></div>
+                                        <div className={`h-7 w-7 bg-white border-solid border-2 ${admin.user.appearance.buttons.shadowColor === 'white' ? 'border-black' : 'border-white hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonShadowColor(admin.user.username, 'white')}></div>
                                     </div>
                                 </div>
                             </div>
                         </div>}
                         <div className="flex flex-col gap-1.5">
                             <p className="font-medium">Button Font Color</p>
-                            <div className="flex gap-5">
-                                <div className="w-24 h-auto bg-[#D9D9D9] p-2 rounded-md">
+                            <div className="flex xs:flex-row xs:gap-5 xxxxs:flex-col">
+                                <div className="xs:w-24 xs:h-24 xxxxs:w-full xxxxs:h-14 bg-[#D9D9D9] p-2 xs:rounded-md xxxxs:rounded-t-md">
                                     <div className="w-full h-full rounded-md" style={{backgroundColor: admin.user.appearance.buttons.fontColor}}></div>
                                 </div>
-                                <div className="flex flex-col bg-[#D9D9D9] p-1.5 rounded-md">
+                                <div className="flex flex-col bg-[#D9D9D9] p-1.5 xs:rounded-md xs:border-none xxxxs:rounded-b-md xxxxs:border xxxxs:border-solid xxxxs:border-t-neutral-400">
                                     <p className="font-medium">Button Color</p>
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex gap-3">
-                                            <div className={`h-7 w-7 bg-red-600 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#dc2626' ? 'border-black' : 'border-red-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#dc2626')}></div>
-                                            <div className={`h-7 w-7 bg-orange-500 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#f97316' ? 'border-black' : 'border-orange-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#f97316')}></div>
-                                            <div className={`h-7 w-7 bg-yellow-400 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#facc15' ? 'border-black' : 'border-yellow-400 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#facc15')}></div>
-                                            <div className={`h-7 w-7 bg-green-600 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#16a34a' ? 'border-black' : 'border-green-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#16a34a')}></div>
-                                            <div className={`h-7 w-7 bg-blue-700 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#1d4ed8' ? 'border-black' : 'border-blue-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#1d4ed8')}></div>                                        
-                                        </div>
-                                        <div className="flex gap-3">
-                                            <div className={`h-7 w-7 bg-purple-700 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#7e22ce' ? 'border-black' : 'border-purple-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#7e22ce')}></div>
-                                            <div className={`h-7 w-7 bg-fuchsia-500 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#d946ef' ? 'border-black' : 'border-fuchsia-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#d946ef')}></div>
-                                            <div className={`h-7 w-7 bg-yellow-900 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#713f12' ? 'border-black' : 'border-yellow-900 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#713f12')}></div>
-                                            <div className={`h-7 w-7 bg-black border-solid border-2 ${admin.user.appearance.buttons.fontColor === 'black' ? 'border-neutral-500' : 'border-black hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, 'black')}></div>
-                                            <div className={`h-7 w-7 bg-white border-solid border-2 ${admin.user.appearance.buttons.fontColor === 'white' ? 'border-black' : 'border-white hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, 'white')}></div>
-                                        </div>
+                                    <div className="flex flex-wrap gap-3">
+                                        <div className={`h-7 w-7 bg-red-600 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#dc2626' ? 'border-black' : 'border-red-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#dc2626')}></div>
+                                        <div className={`h-7 w-7 bg-orange-500 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#f97316' ? 'border-black' : 'border-orange-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#f97316')}></div>
+                                        <div className={`h-7 w-7 bg-yellow-400 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#facc15' ? 'border-black' : 'border-yellow-400 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#facc15')}></div>
+                                        <div className={`h-7 w-7 bg-green-600 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#16a34a' ? 'border-black' : 'border-green-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#16a34a')}></div>
+                                        <div className={`h-7 w-7 bg-blue-700 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#1d4ed8' ? 'border-black' : 'border-blue-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#1d4ed8')}></div>                                        
+                                        <div className={`h-7 w-7 bg-purple-700 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#7e22ce' ? 'border-black' : 'border-purple-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#7e22ce')}></div>
+                                        <div className={`h-7 w-7 bg-fuchsia-500 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#d946ef' ? 'border-black' : 'border-fuchsia-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#d946ef')}></div>
+                                        <div className={`h-7 w-7 bg-yellow-900 border-solid border-2 ${admin.user.appearance.buttons.fontColor === '#713f12' ? 'border-black' : 'border-yellow-900 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, '#713f12')}></div>
+                                        <div className={`h-7 w-7 bg-black border-solid border-2 ${admin.user.appearance.buttons.fontColor === 'black' ? 'border-neutral-500' : 'border-black hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, 'black')}></div>
+                                        <div className={`h-7 w-7 bg-white border-solid border-2 ${admin.user.appearance.buttons.fontColor === 'white' ? 'border-black' : 'border-white hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editButtonFontColor(admin.user.username, 'white')}></div>
                                     </div>
                                 </div>
                             </div>
@@ -824,17 +930,16 @@ const ApperanceSettings = ({ admin, dispatch, windowWidth, windowHeight }) => {
                     </div>
                 </div>
             </div>
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-5 mb-20">
                 <h1 className="text-3xl font-bold">Fonts</h1>
-                <div className="flex flex-col border border-solid border-black rounded-md bg-white p-5">
+                <div className="flex flex-col border border-solid border-black rounded-md bg-white p-5 gap-5">
                     <div className="">
-                        <p className="font-medium mb-2">Font</p>
-                        <div className="flex gap-6 items-center border border-solid border-neutral-400 rounded-md p-7">
-                            <div className="border border-solid border-neutral-400 rounded-md p-5">
+                        <p className="font-medium mb-2">Font {windowWidth}</p>
+                        <div className="flex xxs:flex-row xxxxs:flex-col gap-6 items-center border border-solid border-neutral-400 rounded-md p-7">
+                            <div className="border border-solid border-neutral-400 rounded-md p-5 ">
                                 <p className={`font-${admin.user.appearance.font.fontFamily} font-bold text-xl`}>Aa</p>
                             </div>
-                            <div className="w-full flex justify-items-center justify-evenly flex-wrap gap-3 "> 
-                            {/* Inter✅, Pixelify✅, Bebas Neue✅, Autour One✅, Dancing Script✅, IBM Plex Mono✅, Rajdhani, Caveat✅, Indie Flower✅, Bangers*/}
+                            <div className="w-content flex justify-items-center justify-evenly flex-wrap gap-3  xxxxs:max-h-[278px] xxxxs:overflow-auto xxxxs:text-center"> 
                                 <div className={`border border-solid ${admin.user.appearance.font.fontFamily === 'inter' ? 'border-black hover:cursor-default' : 'border-stone-400 hover:cursor-pointer'} border-1 rounded-md p-2`} onClick={() => editFontFamily(admin.user.username, 'inter')}>
                                     <p className="font-bold text-xl">Inter</p>
                                 </div>
@@ -865,21 +970,31 @@ const ApperanceSettings = ({ admin, dispatch, windowWidth, windowHeight }) => {
                                 <div className={`border border-solid ${admin.user.appearance.font.fontFamily === 'bodoni-moda' ? 'border-black hover:cursor-default' : 'border-stone-400 hover:cursor-pointer'} border-1 rounded-md p-2`} onClick={() => editFontFamily(admin.user.username, 'bodoni-moda')}>
                                     <p className="font-bodoni-moda font-bold text-xl">Bodoni Moda</p>
                                 </div>
-                                {/* <button className="font-bold text-xl">Intefdafsdfasdr</button>
-                                <button className="font-bold text-xl">asdffasdfasdfa</button>
-                                <button className="font-bold text-xl">Intfdasfasder</button>
-                                <button className="font-bold text-xl">Intfdafsder</button>
-                                <button className="font-bold text-xl">dfasdfasdf</button>
-                                <button className="font-bold text-xl">Inter</button>
-                                <button className="font-bold text-xl">Inter</button>
-                                <button className="font-bold text-xl">Inter</button>
-                                <button className="font-bold text-xl">Intdfdsafsder</button>
-                                <button className="font-bold text-xl">fdasfasdfasdf</button> */}
                             </div>
                         </div>
                     </div>
-                    <div>
-                        <p>Color</p>
+                    <div className="flex flex-col gap-1.5">
+                        <p className="font-medium">Color</p>
+                        <div className="flex xs:flex-row xs:gap-5 xxxxs:flex-col">
+                            <div className="xs:w-24 xs:h-24 xxxxs:w-full xxxxs:h-14 bg-[#D9D9D9] p-2 xs:rounded-md xxxxs:rounded-t-md">
+                                <div className="w-full h-full rounded-md" style={{backgroundColor: admin.user.appearance.font.fontColor}}></div>
+                            </div>
+                            <div className="flex flex-col bg-[#D9D9D9] p-1.5 xs:rounded-md xs:border-none xxxxs:rounded-b-md xxxxs:border xxxxs:border-solid xxxxs:border-t-neutral-400">
+                                <p className="font-medium">Font Color</p>
+                                <div className="flex flex-wrap gap-3">
+                                    <div className={`h-7 w-7 bg-red-600 border-solid border-2 ${admin.user.appearance.font.fontColor === '#dc2626' ? 'border-black' : 'border-red-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editFontColor(admin.user.username, '#dc2626')}></div>
+                                    <div className={`h-7 w-7 bg-orange-500 border-solid border-2 ${admin.user.appearance.font.fontColor === '#f97316' ? 'border-black' : 'border-orange-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editFontColor(admin.user.username, '#f97316')}></div>
+                                    <div className={`h-7 w-7 bg-yellow-400 border-solid border-2 ${admin.user.appearance.font.fontColor === '#facc15' ? 'border-black' : 'border-yellow-400 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editFontColor(admin.user.username, '#facc15')}></div>
+                                    <div className={`h-7 w-7 bg-green-600 border-solid border-2 ${admin.user.appearance.font.fontColor === '#16a34a' ? 'border-black' : 'border-green-600 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editFontColor(admin.user.username, '#16a34a')}></div>
+                                    <div className={`h-7 w-7 bg-blue-700 border-solid border-2 ${admin.user.appearance.font.fontColor === '#1d4ed8' ? 'border-black' : 'border-blue-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editFontColor(admin.user.username, '#1d4ed8')}></div>                                        
+                                    <div className={`h-7 w-7 bg-purple-700 border-solid border-2 ${admin.user.appearance.font.fontColor === '#7e22ce' ? 'border-black' : 'border-purple-700 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editFontColor(admin.user.username, '#7e22ce')}></div>
+                                    <div className={`h-7 w-7 bg-fuchsia-500 border-solid border-2 ${admin.user.appearance.font.fontColor === '#d946ef' ? 'border-black' : 'border-fuchsia-500 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editFontColor(admin.user.username, '#d946ef')}></div>
+                                    <div className={`h-7 w-7 bg-yellow-900 border-solid border-2 ${admin.user.appearance.font.fontColor === '#713f12' ? 'border-black' : 'border-yellow-900 hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editFontColor(admin.user.username, '#713f12')}></div>
+                                    <div className={`h-7 w-7 bg-black border-solid border-2 ${admin.user.appearance.font.fontColor === 'black' ? 'border-neutral-500' : 'border-black hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editFontColor(admin.user.username, 'black')}></div>
+                                    <div className={`h-7 w-7 bg-white border-solid border-2 ${admin.user.appearance.font.fontColor === 'white' ? 'border-black' : 'border-white hover:border-neutral-500 hover:cursor-pointer'} rounded-full`} onClick={() => editFontColor(admin.user.username, 'white')}></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

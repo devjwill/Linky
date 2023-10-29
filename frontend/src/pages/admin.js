@@ -13,6 +13,7 @@ import AdminNavbar from "../components/admin/adminNav";
 import Links from "../components/admin/links/links";
 import Appearance from "../components/admin/appearance/appearance";
 import Analytics from "../components/admin/analytics";
+import Settings from "../components/settings";
 
 const Admin = () => {
     const { user } = useAuthContext()
@@ -20,7 +21,8 @@ const Admin = () => {
     const { logout } = useLogout()
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
     const [windowHeight, setWindowHeight] = useState(window.innerHeight)
-    const [page, setPage] = useState(0) //0 = links 1 = apperance 2 = analytics
+    const [page, setPage] = useState(0) //0 = links 1 = apperance 2 = analytics 3 = settings
+    const [isVisible, setIsVisible] = useState('links')
 
     //get user data from the payload
     useEffect(() => {
@@ -62,10 +64,14 @@ const Admin = () => {
 
     return (
         <div className="bg-admin-background min-h-screen">
-            <AdminNavbar user={user} admin={admin} windowWidth={windowWidth} windowHeight={windowHeight} page={page} setPage={setPage}/>
-            {page === 0 && <Links windowWidth={windowWidth} windowHeight={windowHeight}/>}
-            {page === 1 && <Appearance windowWidth={windowWidth} windowHeight={windowHeight}/>}
+            <AdminNavbar user={user} admin={admin} windowWidth={windowWidth} windowHeight={windowHeight} page={page} setPage={setPage} isVisible={isVisible} setIsVisible={setIsVisible}/>
+            {page === 0 && <Links windowWidth={windowWidth} windowHeight={windowHeight} isVisible={isVisible} setIsVisible={setIsVisible} />}
+            {page === 1 && <Appearance windowWidth={windowWidth} windowHeight={windowHeight} isVisible={isVisible} setIsVisible={setIsVisible}/>}
             {page === 2 && <Analytics/>}
+            {page === 3 && 
+            <div className="overflow-auto" style={{maxHeight: windowHeight - 96}}>
+                <Settings windowWidth={windowWidth} windowHeight={windowHeight}/>
+            </div>}
             {/* <button className="bg-red-600 rounded-full p-3 text-white font-bold" onClick={logout}>Logout</button> */}
         </div>
     )

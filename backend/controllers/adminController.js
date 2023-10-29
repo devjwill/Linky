@@ -2,6 +2,8 @@
 const User = require('../models/userModel')
 const Link = require('../models/linkModel')
 const mongoose = require('mongoose')
+const validator = require('validator')
+const bcrypt = require('bcrypt')
 
 const getAdmin = async (req, res) => {
     console.log('get ' + req.path)
@@ -309,6 +311,130 @@ const patch = async (req, res) => {
         res.status(200).json(updatedFontFamily.appearance.font.fontFamily)
       } else {
         res.status(400).json({error: 'Failed to make change to font family'})
+      }
+    } else if (req.body.username && req.body.fontColor) { //Edit font color
+      const { username, fontColor } = req.body
+      const updatedFontColor = await User.findOneAndUpdate({ username }, { $set: { "appearance.font.fontColor": fontColor } }, { returnOriginal: false })
+
+      if (updatedFontColor) {
+        res.status(200).json(updatedFontColor.appearance.font.fontColor)
+      } else {
+        res.status(400).json({error: 'Failed to make change to font color'})
+      }
+    } else if (req.body.username && req.body.firstName) { //Edit first name
+      const { username, firstName } = req.body
+      let valid = true
+      const regex = /^[\p{L}']+$/u
+      if(firstName.includes(`'`)) {
+        res.status(400).json({error: "Please input a valid first name"})
+        valid = false
+      }
+      if(!validator.isAlpha(firstName)) {
+          if(!validator.matches(firstName, regex)) {
+            res.status(400).json({error: "Please input a valid first name"})
+            valid = false
+          }
+      }
+      if(firstName.length > 15) {
+          res.status(400).json({error: "Maximum character length for name is 15"})
+          valid = false
+      }
+
+      if (valid) {
+        const updatedFirstName = await User.findOneAndUpdate({ username }, { $set: { firstName } }, { returnOriginal: false })
+        if (updatedFirstName) {
+          res.status(200).json(updatedFirstName.firstName)
+        } else {
+          res.status(400).json({error: 'Failed to make change to first name'})
+        }
+      }
+    } else if (req.body.username && req.body.lastName) { //Edit last name
+      const { username, lastName } = req.body
+      let valid = true
+      const regex = /^[\p{L}']+$/u
+      if(lastName.includes(`'`)) {
+        res.status(400).json({error: "Please input a valid last name"})
+        valid = false
+      }
+      if(!validator.isAlpha(lastName)) {
+          if(!validator.matches(lastName, regex)) {
+            res.status(400).json({error: "Please input a valid last name"})
+            valid = false
+          }
+      }
+      if(lastName.length > 15) {
+          res.status(400).json({error: "Maximum character length for name is 15"})
+          valid = false
+      }
+
+      if (valid) {
+        const updatedLastName = await User.findOneAndUpdate({ username }, { $set: { lastName } }, { returnOriginal: false })
+        if (updatedLastName) {
+          res.status(200).json(updatedLastName.lastName)
+        } else {
+          res.status(400).json({error: 'Failed to make change to last name'})
+        } 
+      }
+
+
+    } else if (req.body.username && req.body.email) { //Edit email
+      const { username, email } = req.body
+      const emailExists = await User.find({ email })
+
+      if (emailExists.length > 0) {
+        res.status(400).json({error: 'This email is already in use'})
+      } else {
+        if (!validator.isEmail(email)) {
+          res.status(400).json({error: "Please enter a valid email"})
+        } else {
+          const updatedEmail = await User.findOneAndUpdate({ username }, { $set: { email } }, { returnOriginal: false })
+
+          if (updatedEmail) {
+            res.status(200).json(updatedEmail.email)
+          } else {
+            res.status(400).json({error: 'Failed to make change to email'})
+          }
+        }
+      }
+    } else if (req.body.username && req.body.newUsername) { //Edit username
+      const { username, newUsername } = req.body
+      const usernameExists = await User.find({ username: newUsername })
+
+      const regex = /^[A-Za-z0-9_]*[A-Za-z][A-Za-z0-9_]*$/
+
+      if (usernameExists.length > 0) {
+        res.status(400).json({error: 'Username already exists'})
+      } else if (newUsername.length > 20) {
+        res.status(400).json({error: 'Maximum character length for username is 20'})
+      } else if (!regex.test(newUsername)) {
+        res.status(400).json({error: 'Username only accepts A-Z, 0-9, and _'})
+      } else {
+        const updatedUsername = await User.findOneAndUpdate({ username }, { $set: { username: newUsername } }, { returnOriginal: false })
+
+        if (updatedUsername) {
+          res.status(200).json(updatedUsername.username)
+        } else {
+          res.status(400).json({error: 'Failed to make change to username'})
+        }
+      }
+    } else if (req.body.username && req.body.password1 && req.body.password2) {
+      const { username, password1, password2 } = req.body
+      
+      if (password1 !== password2) {
+        res.status(400).json({error: "Passwords don't match"})
+      } else if (!validator.isStrongPassword(password1)) {
+        res.status(400).json({error: "Password is not strong enough"})
+      } else {
+        const salt = await bcrypt.genSalt(10)
+        const hash = await bcrypt.hash(password1, salt)
+
+        const updatedPassword = await User.findOneAndUpdate({ username }, { $set: { "password": hash } }, { returnOriginal: false })
+
+        if (updatedPassword) {
+          res.status(200).json(updatedPassword.password)
+        } else {
+          res.status(400).json({error: 'Failed to make change to password'})
+        }
       }
     }
 }

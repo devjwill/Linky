@@ -7,7 +7,12 @@ import Jungle from '../../assests/jungle.jpg'
 import Bookshelf from '../../assests/bookshelf.jpg'
 import Gaming from '../../assests/gaming.jpg'
 
-const Preview = ({ admin }) => {
+import { useState, useRef, useEffect } from 'react'
+
+const Preview = ({ admin, windowWidth, windowHeight }) => {
+    const [height, setHeight] = useState('0px')
+    const [state, setState] = useState('500px')
+    const previewHeightRef = useRef(null)
     const visibleLinks = admin.links.filter(link => link.visible)
     const images = [{ 
         name: "Space",
@@ -42,28 +47,42 @@ const Preview = ({ admin }) => {
         url: Gaming
     }]
 
+    useEffect(() => {
+        let content = 120
+        if (windowWidth > 767) {
+            content += 160
+        } else if (windowWidth < 767) {
+            content += 140
+        }
+
+        // 8px for border
+        //16px for padding
+
+        setHeight(`${windowHeight - content}px`)
+
+    }, [windowHeight])
+
     const containerStyles = (background) => {
         if (background[0] === "#" && background.length <= 7) { //solid color
-            return { background: `${background}` }
+            return { background: `${background}`, height: height}
         } else if (background[0] === "#" && background.length > 7) { //gradient
             const colorsArr = background.split(" ")
             const color1 = colorsArr[0]
             const color2 = colorsArr[1]
             const gradientDirection = colorsArr[2]
             if (gradientDirection === 'up' || !gradientDirection) {
-                return { backgroundImage: `linear-gradient(to top, ${color1}, ${color2})` }
+                return { backgroundImage: `linear-gradient(to top, ${color1}, ${color2})`, height: height}
             } else if (gradientDirection === 'down') {
-                return { backgroundImage: `linear-gradient(to bottom, ${color1}, ${color2})` }
+                return { backgroundImage: `linear-gradient(to bottom, ${color1}, ${color2})`, height: height }
             }
         } else { //image
-            return { backgroundImage: `url(${images[images.findIndex((item) => item.name === admin.user.appearance.background)].url})`, backgroundPosition: 'center', backgroundSize: 'cover' }
+            return { backgroundImage: `url(${images[images.findIndex((item) => item.name === admin.user.appearance.background)].url})`, backgroundPosition: 'center', backgroundSize: 'cover', height: height}
         }
     }
 
     const buttonStyles = (design) => {
         let effect
         let shape
-
         if (design.design.split("-")[0] === 'fill') {
             effect = { background: design.color }
         } else if (design.design.split("-")[0] === 'outline') {
@@ -92,31 +111,34 @@ const Preview = ({ admin }) => {
         }
 
         const fontColor = { color: design.fontColor }
+        // const height = { height: height }
 
-        const finalDesign = {...effect, ...shape, ...fontColor }
+        const finalDesign = {...effect, ...shape, ...fontColor}
         return finalDesign
     }
 
     return (
-        <div className="w-1/3 py-20 px-36 lg:px-28 md:px-20 kdi:px-11 sm:px-3 idk:px-1 flex justify-center">
+        <div className="idk:w-1/3 idk:py-20 xxxxs:pt-10 px-36 lg:px-28 md:px-20 kdi:px-11 sm:px-3 idk:px-1 xs:px-20 xxs:px-12 xxxs:px-8 xxxxs:px-0  flex justify-center">
             <div className='w-full h-full rounded-[40px] border border-4 border-solid border-zinc-500 p-2 bg-black'>
-                <div className={`flex flex-col items-center w-full h-full rounded-[30px] p-6 font-${admin.user.appearance.font.fontFamily}`} style={containerStyles(admin.user.appearance.background)}>
+                {height && <div className={`flex flex-col items-center w-full  overflow-auto  rounded-[30px] p-6 font-${admin.user.appearance.font.fontFamily}`} style={containerStyles(admin.user.appearance.background)} ref={previewHeightRef}>
                     <div className='flex flex-col items-center gap-2 mb-5'>
                         <img src={admin.user.profilePicture} className='rounded-full w-28 '></img>
                         <h1 className="font-bold text-xl" style={{color: `${admin.user.appearance.font.fontColor}`}}>{admin.user.appearance.profileTitle}</h1>
-                        <p className="text-white">{admin.user.bio}</p>
+                        <p className="" style={{color: `${admin.user.appearance.font.fontColor}`}}>{admin.user.bio}</p>
                     </div>
-                    <div className='flex flex-col items-center gap-3'>
+                    <div className='flex flex-col items-center gap-10'>
                         {/* {admin.links.map((link) => (
                             <a key={link._id} className='border border-solid border-white border-2 rounded-full p-2 font-medium' href={`https://www.${link.url}`} target="_blank">{link.title}</a>
                         ))} */}
                         {visibleLinks.map((link) => (
-                            <a key={link._id} className='p-2 font-medium' style={buttonStyles(admin.user.appearance.buttons)} href={`https://www.${link.url}`} target="_blank">{link.title}</a>
+                            <div className='2xl:w-96 xl:w-72 lg:w-60 sm:w-52 idk:w-40 xs:w-56 xxs:w-48 xxxxs:w-32 flex justify-center'>
+                                <a key={link._id} className='p-2 font-medium  whitespace-nowrap overflow-hidden text-ellipsis' style={buttonStyles(admin.user.appearance.buttons)} href={`https://www.${link.url}`} target="_blank">{link.title}</a>
+                            </div>
                         ))}
                     </div>
-                </div>
+                </div>}
             </div>
-        </div> 
+        </div>
     )
 }
 

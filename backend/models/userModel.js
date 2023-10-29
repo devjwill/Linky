@@ -108,7 +108,7 @@ userSchema.statics.signup = async function (firstName, lastName, email, password
         }
     }
     if(firstName.length > 15) {
-        throw Error("Maximum character length for name is 50")
+        throw Error("Maximum character length for name is 15")
     }
 
     //Last name validation
@@ -141,6 +141,10 @@ userSchema.statics.signup = async function (firstName, lastName, email, password
         throw Error("Maximum character length for username is 20")
     }
 
+    const usernameRegex = /^[A-Za-z0-9_]*[A-Za-z][A-Za-z0-9_]*$/
+    if (!usernameRegex.test(username)) {
+        throw Error("Username only accepts A-Z, 0-9, and _")
+    }
 
 
     //Email and Username uniqueness

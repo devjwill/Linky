@@ -11,6 +11,4 @@ POTENTIAL PROBLEMS
 -some alphabets not recognized for names, case insensitive for usernames (ayedev, ayedev) signup
 
 
-
-refresh invalid hex code ❓
-start and finish fonts
+figure out actually making the link tree url with all of the user's links
