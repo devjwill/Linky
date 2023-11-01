@@ -10,111 +10,145 @@ const getAdmin = async (req, res) => {
     res.status(200)
 }
 
+// const getUserData = async (req, res) => {
+//     console.log('geting user data')
+//     const { username } = req.params
+//     if (!username) {
+//         return res.status(400).json({ error: "Username parameter is missing." })
+//     }
+//     const user = await User.find({ username })
+//     if (!user) {
+//         return res.status(404).json({ error: "User not forund." })
+//     }
+//     const _id = user[0]._id
+
+//     if (user[0].links.length < 1) {
+//       const userData = {
+//         user: user[0],
+//         links: []
+//       }
+//       res.status(200).json(userData)
+//     } else {
+
+
+//     const linkData = await User.aggregate([
+//         {
+//           $match: {
+//             _id // Replace with the user's ID you're interested in.
+//           }
+//         },
+//         {
+//           $lookup: {
+//             from: "links",
+//             localField: "links",
+//             foreignField: "_id",
+//             as: "userLinks"
+//           }
+//         },
+//         {
+//           $unwind: "$userLinks"
+//         },
+//         {
+//           $addFields: {
+//             sortIndex: {
+//               $indexOfArray: ["$links", "$userLinks._id"]
+//             }
+//           }
+//         },
+//         {
+//           $sort: {
+//             sortIndex: 1 // Sorting in ascending order based on the sortIndex.
+//           }
+//         },
+//         {
+//           $group: {
+//             _id: "$_id",
+//             sortedLinks: {
+//               $push: "$userLinks"
+//             }
+//           }
+//         },
+//         {
+//           $project: {
+//             _id: 0,
+//             sortedLinks: 1
+//           }
+//         }
+//       ]);
+
+//       const userData = {
+//         user: user[0],
+//         links: linkData[0].sortedLinks
+//       }
+//       res.status(200).json(userData)
+//     }
+// }
+
+// const createLink = async (req, res) => {
+//     console.log('creating a new link')
+//     const { username } = req.params
+//     const { url, title } = req.body
+//     if (!username) {
+//         return res.status(400).json({ error: "Username parameter is missing." })
+//     }
+//     const user = await User.find({ username })
+//     if (!user) {
+//         return res.status(400).json({error: 'User not found.'})
+//     }
+//     const duplicate = await Link.find({ user: user[0]._id, url: url })
+//     if (duplicate.length >= 1) {
+//         return res.status(400).json({error: 'Duplicate url.'})
+//     }
+
+//     try {
+//         const newLink = new Link({user: user[0]._id, url, title})
+//         newLink.save()
+//         .then(link => {
+//             // return User.findByIdAndUpdate(user[0]._id, { $push: { links: { $each: [link._id]},   } }, { new: true })
+//             return User.findByIdAndUpdate(user[0]._id, { $push: { links: { $each: [link._id], $position: 0 } } }, { returnOriginal: false } )
+//         })
+//         res.status(200).json(newLink)
+//     } catch (error) {
+//         console.log('Error: ', error)
+//     }
+// }
+
 const getUserData = async (req, res) => {
-    console.log('geting user data')
-    const { username } = req.params
-    if (!username) {
-        return res.status(400).json({ error: "Username parameter is missing." })
-    }
-    const user = await User.find({ username })
-    if (!user) {
-        return res.status(404).json({ error: "User not forund." })
-    }
-    const _id = user[0]._id
+  const { username } = req.params
 
-    if (user[0].links.length < 1) {
-      const userData = {
-        user: user[0],
-        links: []
-      }
-      res.status(200).json(userData)
-    } else {
+  const user = await User.find({ username })
 
-
-    const linkData = await User.aggregate([
-        {
-          $match: {
-            _id // Replace with the user's ID you're interested in.
-          }
-        },
-        {
-          $lookup: {
-            from: "links",
-            localField: "links",
-            foreignField: "_id",
-            as: "userLinks"
-          }
-        },
-        {
-          $unwind: "$userLinks"
-        },
-        {
-          $addFields: {
-            sortIndex: {
-              $indexOfArray: ["$links", "$userLinks._id"]
-            }
-          }
-        },
-        {
-          $sort: {
-            sortIndex: 1 // Sorting in ascending order based on the sortIndex.
-          }
-        },
-        {
-          $group: {
-            _id: "$_id",
-            sortedLinks: {
-              $push: "$userLinks"
-            }
-          }
-        },
-        {
-          $project: {
-            _id: 0,
-            sortedLinks: 1
-          }
-        }
-      ]);
-
-    // const linkData = await Link.find({ user: user[0]._id }).sort({ _id: -1 })
-    // if (!linkData) {
-    //     return res.status(400).json({error: "Link data not found"})
-    // }
-      const userData = {
-        user: user[0],
-        links: linkData[0].sortedLinks
-      }
-      res.status(200).json(userData)
-    }
+  if (user) {
+    res.status(200).json(user[0])
+  } else if (!user) {
+    res.status(400).json({error: "User not found"})
+  }
 }
 
 const createLink = async (req, res) => {
-    console.log('creating a new link')
-    const { username } = req.params
-    const { url, title } = req.body
-    if (!username) {
-        return res.status(400).json({ error: "Username parameter is missing." })
-    }
-    const user = await User.find({ username })
-    if (!user) {
-        return res.status(400).json({error: 'User not found.'})
-    }
-    const duplicate = await Link.find({ user: user[0]._id, url: url })
-    if (duplicate.length >= 1) {
-        return res.status(400).json({error: 'Duplicate url.'})
-    }
+  const { username } = req.params
+  const { url, title } = req.body
 
-    try {
-        const newLink = new Link({user: user[0]._id, url, title})
-        newLink.save()
-        .then(link => {
-            // return User.findByIdAndUpdate(user[0]._id, { $push: { links: { $each: [link._id]},   } }, { new: true })
-            return User.findByIdAndUpdate(user[0]._id, { $push: { links: { $each: [link._id], $position: 0 } } }, { returnOriginal: false } )
-        })
-        res.status(200).json(newLink)
-    } catch (error) {
-        console.log('Error: ', error)
+  const user = await User.find({ username })
+  
+  if(user) {
+    //create id
+    const timestamp = new Date().getTime()
+    const randomValue = Math.floor(Math.random() * 10000)
+    const randomId = `${timestamp}${randomValue}`;
+    const link = {
+      id: randomId,
+      url: url,
+      title: title,
+      thumbnail: "",
+      visible: true,
+      views: 0
     }
+    const newLink = await User.findOneAndUpdate({ username }, { $push: { links: { $each: [link], $position: 0 } } }, { returnOriginal: false })
+    res.status(200).json(newLink.links[0])
+  } else if (!user) {
+    res.status(404).json({ error: "User not found" })
+  }
 }
 
 const editLink = async (req, res) => {
@@ -151,69 +185,119 @@ const editLink = async (req, res) => {
     res.status(200).json(newLink)
 }
 
+// const deleteLink = async (req, res) => {
+//     console.log('deleting a link')
+//     const { username } = req.params
+//     const { url } = req.body
+//     if (!username) {
+//         res.status(400).json({error: "Username parameter is missing."})
+//     }
+//     const user = await User.find({ username })
+//     if (!user) {
+//         res.status(404).josn({error: 'User not found'})
+//     }
+
+//     const userID = user[0]._id
+
+//     const deletedLinkFromLink = await Link.findOneAndDelete({user: userID, url})
+//     if(!deletedLinkFromLink) {
+//         res.status(404).json({error: 'Link not found in links collection'})
+//     }
+
+//     const linkID = deletedLinkFromLink._id
+
+//     const deletedLinkFromUser = await User.updateOne({ username }, { $pull: { ["links"]: { $in: linkID } } })
+
+//     if (deletedLinkFromUser.matchedCount !== 1) {
+//         res.status(404).json({error: "Link not found in user's collection"})
+//     }
+
+
+//     res.status(200).json(deletedLinkFromLink)
+// }
+
 const deleteLink = async (req, res) => {
-    console.log('deleting a link')
-    const { username } = req.params
-    const { url } = req.body
-    if (!username) {
-        res.status(400).json({error: "Username parameter is missing."})
+  //find user -> access links array -> find the link that needs to be deleted by id -> update the array -> send the id to the frontend to handle the rest
+  const { username } = req.params
+  const { id } = req.body
+
+  const user = await User.find({ username })
+
+  if (user) {
+    const deletedLink = await User.findOneAndUpdate({ username }, { $pull: { links: { id } } })
+    if (deletedLink) {
+      res.status(200).json(id)
+    } else if (!deletedLink) {
+      res.status(400).json({error: 'Failed to delete link'})
     }
-    const user = await User.find({ username })
-    if (!user) {
-        res.status(404).josn({error: 'User not found'})
-    }
-
-    const userID = user[0]._id
-
-    const deletedLinkFromLink = await Link.findOneAndDelete({user: userID, url})
-    if(!deletedLinkFromLink) {
-        res.status(404).json({error: 'Link not found in links collection'})
-    }
-
-    const linkID = deletedLinkFromLink._id
-
-    const deletedLinkFromUser = await User.updateOne({ username }, { $pull: { ["links"]: { $in: linkID } } })
-
-    if (deletedLinkFromUser.matchedCount !== 1) {
-        res.status(404).json({error: "Link not found in user's collection"})
-    }
-
-
-    res.status(200).json(deletedLinkFromLink)
+  } else if (!user) {
+    res.status(404).json({error: "User not found"})
+  }
 }
 
 const patch = async (req, res) => {
-    if (req.body.content && req.body.id) { //Edit link data
-        const { id, content } = req.body
+    if (req.body.content && req.body.username && req.body.id) { //Edit link data
+      // find the link that needs to be edited -> send the updated link 
+        const { content, username, id } = req.body
 
-        if (!id) {
-            return res.status(400).json({error: '_id parameter is missing'})
+        const user = await User.findOne({ username })
+
+        if (user) {
+          let edited
+          const index = user.links.findIndex((obj) => obj.id === id)
+          if (content.title && user.links[index].title !== content.title) {
+            newLink = await User.findOneAndUpdate({ username, "links.id": id }, { $set: { 'links.$.title': content.title } }, { returnOriginal: false })
+            edited = "title"
+            res.status(200).json({edited, newValue: content.title, id, index})
+          } else if (content.url && user.links[index].url !== content.url) {
+              newLink = await User.findOneAndUpdate({ username, "links.id": id }, { $set: { 'links.$.url': content.url } }, { returnOriginal: false })
+              edited = "url"
+              res.status(200).json({edited, newValue: content.url, id, index})
+          } else if (content.thumbnail && user.links[index].thumbnail !== content.thumbnail) {
+              newLink = await User.findOneAndUpdate({ username, "links.id": id }, { $set: { 'links.$.thumbnail': content.thumbnail } }, { returnOriginal: false })
+              edited = "thumbnail"
+              res.status(200).json({edited, newValue: content.thumbnail, id, index})
+          } else if (content.visible != null && user.links[index].visible != content.visible) {
+              newLink = await User.findOneAndUpdate({ username, "links.id": id }, { $set: { 'links.$.visible': content.visible } }, { returnOriginal: false })
+              edited = "visible"
+              res.status(200).json({edited, newValue: content.visible, id, index})
+          } else {
+              return res.status(400).json({error: 'No changes made'})
+          }
+        } else if (!user) {
+          res.status(404).json({error: 'User not found'})
         }
+
+        // if (!id) {
+        //     return res.status(400).json({error: '_id parameter is missing'})
+        // }
     
-        const link = await Link.find({ _id: id })
-        if (!link) {
-            return res.status(404).json({error: 'Link not found'})
-        }
+        // const link = await Link.find({ _id: id })
+        // if (!link) {
+        //     return res.status(404).json({error: 'Link not found'})
+        // }
     
-        if (content.title === "" || content.url === "") {
-            return res.status(400).json({error: 'This field cannot be empty.'})
-        }
+        // if (content.title === "" || content.url === "") {
+        //     return res.status(400).json({error: 'This field cannot be empty.'})
+        // }
     
-        let newLink
+        // let newLink
     
-        if (content.title && link[0].title !== content.title) {
-            newLink = await Link.findOneAndUpdate({ _id: id }, { $set: { title: content.title } }, { returnOriginal: false })
-        } else if (content.url && link[0].url !== content.url) {
-            newLink = await Link.findOneAndUpdate({ _id: id }, { $set: { url: content.url } }, { returnOriginal: false })
-        } else if (content.thumbnail) {
-            newLink = await Link.findOneAndUpdate({ _id: id }, { $set: { thumbnail: content.thumbnail } }, { returnOriginal: false })
-        } else if (content.visible != null) {
-            newLink = await Link.findOneAndUpdate({ _id: id }, { $set: { visible: content.visible } }, { returnOriginal: false })
-        } else if(!newLink) {
-            return res.status(400).json({error: 'No changes made'})
-        }
+        // if (content.title && link[0].title !== content.title) {
+        //     newLink = await Link.findOneAndUpdate({ _id: id }, { $set: { title: content.title } }, { returnOriginal: false })
+        // } else if (content.url && link[0].url !== content.url) {
+        //     newLink = await Link.findOneAndUpdate({ _id: id }, { $set: { url: content.url } }, { returnOriginal: false })
+        // } else if (content.thumbnail) {
+        //     newLink = await Link.findOneAndUpdate({ _id: id }, { $set: { thumbnail: content.thumbnail } }, { returnOriginal: false })
+        // } else if (content.visible != null) {
+        //     newLink = await Link.findOneAndUpdate({ _id: id }, { $set: { visible: content.visible } }, { returnOriginal: false })
+        // } else if(!newLink) {
+        //     return res.status(400).json({error: 'No changes made'})
+        // }
     
-        res.status(200).json(newLink)
+        // res.status(200).json(newLink)
+
+
     } else if (req.body.username && req.body.userLinks) { //Edit link order
       const { username, userLinks } = req.body
 

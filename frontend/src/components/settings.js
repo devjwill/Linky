@@ -12,8 +12,8 @@ const Settings = ({ windowWidth, windowHeight }) => {
     const { dispatch, admin } = useAdminContext()
     const [isEditing, setIsEditing] = useState("")
     const [editInfo, setEditInfo] = useState("")
-    const [email, setEmail] = useState(admin.user.email)
-    const [username, setUsername] = useState(admin.user.username)
+    const [email, setEmail] = useState(admin.email)
+    const [username, setUsername] = useState(admin.username)
     const [password1, setPassword1] = useState('')
     const [password2, setPassword2] = useState('')
     const [password1Visible, setPassword1Visible] = useState(false)
@@ -31,7 +31,7 @@ const Settings = ({ windowWidth, windowHeight }) => {
     }
 
     const editFirstName = async (username, firstName) => {
-        if (username && firstName && admin.user.firstName !== firstName) {
+        if (username && firstName && admin.firstName !== firstName) {
             const response = await fetch('/api/admin/patch', {
                 method: 'PATCH',
                 headers: {
@@ -53,7 +53,7 @@ const Settings = ({ windowWidth, windowHeight }) => {
     }
 
     const editLastName = async (username, lastName) => {
-        if (username && lastName && admin.user.lastName !== lastName) {
+        if (username && lastName && admin.lastName !== lastName) {
             const response = await fetch('/api/admin/patch', {
                 method: 'PATCH',
                 headers: {
@@ -167,16 +167,16 @@ const Settings = ({ windowWidth, windowHeight }) => {
         setIsEditing('')
         setError('')
         setIsLoading(false)
-        setEmail(admin.user.email)
-        setUsername(admin.user.email)
+        setEmail(admin.email)
+        setUsername(admin.email)
         setPassword1('')
         setPassword2('')
         setPassword1Visible(false)
         setPassword2Visible(false)
         if (field === 'firstName') {
-            setEditInfo(['firstName', admin.user.firstName])
+            setEditInfo(['firstName', admin.firstName])
         } else if (field === 'lastName') {
-            setEditInfo(['lastName', admin.user.lastName])
+            setEditInfo(['lastName', admin.lastName])
         }
     }
 
@@ -191,20 +191,20 @@ const Settings = ({ windowWidth, windowHeight }) => {
         setIsLoading(false)
         setIsEditing(field)
         if (field === 'email') {
-            setUsername(admin.user.username)
+            setUsername(admin.username)
             setPassword1('')
             setPassword2('')
             setPassword1Visible(false)
             setPassword2Visible(false)
         } else if (field === 'username') {
-            setEmail(admin.user.email)
+            setEmail(admin.email)
             setPassword1('')
             setPassword2('')
             setPassword1Visible(false)
             setPassword2Visible(false)
         } else if (field === 'password') {
-            setUsername(admin.user.username)
-            setEmail(admin.user.email)
+            setUsername(admin.username)
+            setEmail(admin.email)
         }
     }
 
@@ -213,9 +213,9 @@ const Settings = ({ windowWidth, windowHeight }) => {
         setError('')
         setIsLoading(false)
         if (field === 'email') {
-            setEmail(admin.user.email)
+            setEmail(admin.email)
         } else if (field === 'username') {
-            setUsername(admin.user.username)
+            setUsername(admin.username)
         } else if (field === 'password') {
             setPassword1('')
             setPassword2('')
@@ -230,7 +230,7 @@ const Settings = ({ windowWidth, windowHeight }) => {
                 if (e.target.id !== 'firstName1' && e.target.id !== 'firstName2' && e.target.id !== 'firstName3' && e.target.id !== 'firstName4') {
                     if (editInfo[1].length <= 15 && validator.isAlpha(editInfo[1])) {
                         console.log('clicked outside of firstName')
-                        editFirstName(admin.user.username, editInfo[1])
+                        editFirstName(admin.username, editInfo[1])
                         setEditInfo([])
                     } else {
                         setEditInfo([])
@@ -240,7 +240,7 @@ const Settings = ({ windowWidth, windowHeight }) => {
                 if (e.target.id !== 'lastName1' && e.target.id !== 'lastName2' && e.target.id !== 'lastName3' && e.target.id !== 'lastName4') {
                     if (editInfo[1].length <= 15 && validator.isAlpha(editInfo[1])) {
                         console.log('clicked outside of lastName')
-                        editLastName(admin.user.username, editInfo[1])
+                        editLastName(admin.username, editInfo[1])
                         setEditInfo([])
                     } else {
                         setEditInfo([])
@@ -253,7 +253,7 @@ const Settings = ({ windowWidth, windowHeight }) => {
             if (editInfo[0] === 'firstName' && e.key === 'Enter') {
                 if (editInfo[1].length <= 15 && validator.isAlpha(editInfo[1])) {
                     console.log('clicked enter on firstName')
-                    editFirstName(admin.user.username, editInfo[1])
+                    editFirstName(admin.username, editInfo[1])
                     setEditInfo([])
                 } else {
                     setEditInfo([])
@@ -261,17 +261,17 @@ const Settings = ({ windowWidth, windowHeight }) => {
             } else if (editInfo[0] === 'lastName' && e.key === 'Enter') {
                 if (editInfo[1].length <= 15 && validator.isAlpha(editInfo[1])) {
                     console.log('clicked enter on lastName')
-                    editLastName(admin.user.username, editInfo[1])
+                    editLastName(admin.username, editInfo[1])
                     setEditInfo([])
                 } else {
                     setEditInfo([])
                 }
             } else if (isEditing === 'email' && e.key === 'Enter') {
-                editEmail(admin.user.username, email)
+                editEmail(admin.username, email)
             } else if (isEditing === 'username' && e.key === 'Enter') {
-                editUsername(admin.user.username, username)
+                editUsername(admin.username, username)
             } else if (isEditing === 'password' && e.key === 'Enter') {
-                changePassword(admin.user.username, password1, password2)
+                changePassword(admin.username, password1, password2)
             }
         }
 
@@ -289,9 +289,9 @@ const Settings = ({ windowWidth, windowHeight }) => {
         <div className="idk:p-20 xxxs:p-10 xxxxs:p-5">
             <div className="flex flex-col gap-5">
                 <h1 className="font-bold text-3xl">Settings</h1>
-                {/* <button className="bg-blue-400 p-2 rouned-md font-bold text-white" onClick={() => editFirstName(admin.user.username, 'deviin')}>Edit First Name</button>
-                <button className="bg-blue-400 p-2 rouned-md font-bold text-white" onClick={() => editLastName(admin.user.username, 'willy')}>Edit Last Name</button>
-                <button className="bg-blue-400 p-2 rouned-md font-bold text-white" onClick={() => editEmail(admin.user.username, 'something@gmail.com')}>Edit Email</button> */}
+                {/* <button className="bg-blue-400 p-2 rouned-md font-bold text-white" onClick={() => editFirstName(admin.username, 'deviin')}>Edit First Name</button>
+                <button className="bg-blue-400 p-2 rouned-md font-bold text-white" onClick={() => editLastName(admin.username, 'willy')}>Edit Last Name</button>
+                <button className="bg-blue-400 p-2 rouned-md font-bold text-white" onClick={() => editEmail(admin.username, 'something@gmail.com')}>Edit Email</button> */}
                 <div className="border border-solid border-black p-5 rounded-md bg-white flex flex-col gap-5">
                     <h2 className="font-semibold text-lg">Edit Settings</h2>
                     <div className="flex flex-col gap-8">
@@ -299,7 +299,7 @@ const Settings = ({ windowWidth, windowHeight }) => {
                             <div className="flex xxs:flex-row xxxxs:flex-col gap-2 xxs:items-center">
                                 <p className="font-medium hover:cursor-default">First Name:</p>
                                 <div id='firstName1' className={`${editInfo[0] === 'firstName' ? '' : 'border border-solid border-stone-300 hover:border-stone-500 hover:cursor-pointer p-2'}  rounded  flex items-center w-fit gap-2`} onClick={() => handleChangeEditInfo('firstName')}>
-                                    {editInfo[0] !== 'firstName' && <p id='firstName2'>{admin.user.firstName}</p>}
+                                    {editInfo[0] !== 'firstName' && <p id='firstName2'>{admin.firstName}</p>}
                                     {editInfo[0] !== 'firstName' && <FaPencil id='firstName3'/>}
                                     {editInfo[0] === 'firstName' && <input autoFocus autoComplete="off" spellCheck="false" id='firstName4' type="text" className="!outline-none 2xl:w-[1900px] xl:w-[1600px] lg:w-[1350px] md:w-[1100px] kdi:w-[850px] sm:w-[600px] idk:w-[450px]" onChange={(e) => handleChange(e.target.value)} value={editInfo[1]}></input>}
                                 </div>
@@ -311,7 +311,7 @@ const Settings = ({ windowWidth, windowHeight }) => {
                             <div className="flex xxs:flex-row xxxxs:flex-col gap-2 xxs:items-center">
                                 <p className="font-medium hover:cursor-default">Last Name:</p>
                                 <div id='lastName1' className={`${editInfo[0] === 'lastName' ? '' : 'border border-solid border-stone-300 hover:border-stone-500 hover:cursor-pointer p-2'}  rounded  flex items-center w-fit gap-2`} onClick={() => handleChangeEditInfo('lastName')}>
-                                    {editInfo[0] !== 'lastName' && <p id='lastName2'>{admin.user.lastName}</p>}
+                                    {editInfo[0] !== 'lastName' && <p id='lastName2'>{admin.lastName}</p>}
                                     {editInfo[0] !== 'lastName' && <FaPencil id='lastName3'/>}
                                     {editInfo[0] === 'lastName' && <input id='lastName4' autoFocus autoComplete="off" spellCheck="false" type="text" className="!outline-none 2xl:w-[1900px] xl:w-[1600px] lg:w-[1350px] md:w-[1100px] kdi:w-[850px] sm:w-[600px] idk:w-[450px]" onChange={(e) => handleChange(e.target.value)} value={editInfo[1]}></input>}
                                 </div>
@@ -331,7 +331,7 @@ const Settings = ({ windowWidth, windowHeight }) => {
                                 </div>
                                 {isEditing === 'email' &&
                                 <div className="flex xxxs:flex-row xxxxs:flex-col gap-2">
-                                    <button onClick={() => editEmail(admin.user.username, email)} className="p-2 rounded-md font-bold text-white bg-gradient-to-b from-gradient-su-blue to-gradient-su-teal flex items-center justify-center">{isLoading ? <span className="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-white rounded-full"></span>: "Done"}</button>
+                                    <button onClick={() => editEmail(admin.username, email)} className="p-2 rounded-md font-bold text-white bg-gradient-to-b from-gradient-su-blue to-gradient-su-teal flex items-center justify-center">{isLoading ? <span className="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-white rounded-full"></span>: "Done"}</button>
                                     <button className="p-2 rounded-md font-bold text-neutral-700 bg-neutral-400" onClick={() => handleCancel('email')}>Cancel</button>
                                 </div>}
                             </div>
@@ -342,14 +342,14 @@ const Settings = ({ windowWidth, windowHeight }) => {
                                 <div className="flex xxs:flex-row xxxxs:flex-col gap-2 xxs:items-center">
                                     <p className="font-medium hover:cursor-default">Username:</p>
                                     <div className={`${isEditing === 'username' ? 'border border-solid border-black' : 'border border-solid border-stone-300 hover:border-stone-500 hover:cursor-pointer'} p-2 rounded  flex items-center w-fit gap-2`} onClick={() => handleChangeIsEditing('username')}>
-                                        {isEditing !== 'username' && <p className="">{admin.user.username}</p>}
+                                        {isEditing !== 'username' && <p className="">{admin.username}</p>}
                                         {isEditing !== 'username' && <FaPencil/>}
                                         {isEditing === 'username' && <input autoFocus autoComplete="off" spellCheck="false" id="username" type="text" className="!outline-none bg-transparent" onChange={(e) => setUsername(e.target.value)} value={username}></input>}
                                     </div>
                                 </div>
                                 {isEditing === 'username' && 
                                 <div className="flex idk:flex-row xxxxs:flex-col gap-2">
-                                    <button onClick={() => editUsername(admin.user.username, username)} className="p-2 rounded-md font-bold text-white bg-gradient-to-b from-gradient-su-blue to-gradient-su-teal flex items-center justify-center">{isLoading ? <span className="flex align-center animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-white rounded-full"></span> : "Done"}</button>
+                                    <button onClick={() => editUsername(admin.username, username)} className="p-2 rounded-md font-bold text-white bg-gradient-to-b from-gradient-su-blue to-gradient-su-teal flex items-center justify-center">{isLoading ? <span className="flex align-center animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-white rounded-full"></span> : "Done"}</button>
                                     <button className="p-2 rounded-md font-bold text-neutral-700 bg-neutral-400" onClick={() => handleCancel('username')}>Cancel</button>
                                 </div>}
                             </div>
@@ -386,7 +386,7 @@ const Settings = ({ windowWidth, windowHeight }) => {
                                 </div>
                                 {isEditing === 'password' && 
                                 <div className="flex idk:flex-row xxxxs:flex-col gap-2">
-                                    <button className="p-2 rounded-md font-bold text-white bg-gradient-to-b from-gradient-su-blue to-gradient-su-teal flex items-center justify-center" onClick={() => changePassword(admin.user.username, password1, password2)}>{isLoading ? <span className="flex align-center animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-white rounded-full"></span> : "Done"}</button>
+                                    <button className="p-2 rounded-md font-bold text-white bg-gradient-to-b from-gradient-su-blue to-gradient-su-teal flex items-center justify-center" onClick={() => changePassword(admin.username, password1, password2)}>{isLoading ? <span className="flex align-center animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-white rounded-full"></span> : "Done"}</button>
                                     <button className="p-2 rounded-md font-bold text-neutral-700 bg-neutral-400" onClick={() => handleCancel('password')}>Cancel</button>
                                 </div>}
                             </div>

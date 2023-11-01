@@ -8,6 +8,7 @@ import Templates from './pages/templates';
 import FAQ from './pages/faq';
 import ContactUs from './pages/contactUs';
 import Admin from './pages/admin';
+import LinkTree from './pages/linktree';
 import { useAuthContext } from './hooks/useAuthContext';
 
 
@@ -26,6 +27,7 @@ function App() {
             <Route path="/faq" element={<FAQ/>} />
             <Route path="/contact-us" element={<ContactUs/>} />
             <Route path="/admin" element={user ? <Admin/> : <Navigate to="/login"/>}/>
+            <Route path='/:username' element={<LinkTree/>}/>
           </Routes>
         </div>
       </BrowserRouter>

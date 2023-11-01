@@ -11,4 +11,6 @@ POTENTIAL PROBLEMS
 -some alphabets not recognized for names, case insensitive for usernames (ayedev, ayedev) signup
 
 
-figure out actually making the link tree url with all of the user's links
+moves links to user's document and finish the link tree page - make sure add admin.whatever is changed correctly
+fix edit link and edit order - editorder acts funny with the number 0 ✅
+preview button showing when there are no links

@@ -76,7 +76,7 @@ const Preview = ({ admin, windowWidth, windowHeight }) => {
                 return { backgroundImage: `linear-gradient(to bottom, ${color1}, ${color2})`, height: height }
             }
         } else { //image
-            return { backgroundImage: `url(${images[images.findIndex((item) => item.name === admin.user.appearance.background)].url})`, backgroundPosition: 'center', backgroundSize: 'cover', height: height}
+            return { backgroundImage: `url(${images[images.findIndex((item) => item.name === admin.appearance.background)].url})`, backgroundPosition: 'center', backgroundSize: 'cover', height: height}
         }
     }
 
@@ -120,19 +120,19 @@ const Preview = ({ admin, windowWidth, windowHeight }) => {
     return (
         <div className="idk:w-1/3 idk:py-20 xxxxs:pt-10 px-36 lg:px-28 md:px-20 kdi:px-11 sm:px-3 idk:px-1 xs:px-20 xxs:px-12 xxxs:px-8 xxxxs:px-0  flex justify-center">
             <div className='w-full h-full rounded-[40px] border border-4 border-solid border-zinc-500 p-2 bg-black'>
-                {height && <div className={`flex flex-col items-center w-full  overflow-auto  rounded-[30px] p-6 font-${admin.user.appearance.font.fontFamily}`} style={containerStyles(admin.user.appearance.background)} ref={previewHeightRef}>
+                {height && <div className={`flex flex-col items-center w-full  overflow-auto  rounded-[30px] p-6 font-${admin.appearance.font.fontFamily}`} style={containerStyles(admin.appearance.background)} ref={previewHeightRef}>
                     <div className='flex flex-col items-center gap-2 mb-5'>
-                        <img src={admin.user.profilePicture} className='rounded-full w-28 '></img>
-                        <h1 className="font-bold text-xl" style={{color: `${admin.user.appearance.font.fontColor}`}}>{admin.user.appearance.profileTitle}</h1>
-                        <p className="" style={{color: `${admin.user.appearance.font.fontColor}`}}>{admin.user.bio}</p>
+                        <img src={admin.profilePicture} className='rounded-full w-28 '></img>
+                        <h1 className="font-bold text-xl" style={{color: `${admin.appearance.font.fontColor}`}}>{admin.appearance.profileTitle}</h1>
+                        <p className="" style={{color: `${admin.appearance.font.fontColor}`}}>{admin.bio}</p>
                     </div>
                     <div className='flex flex-col items-center gap-10'>
                         {/* {admin.links.map((link) => (
                             <a key={link._id} className='border border-solid border-white border-2 rounded-full p-2 font-medium' href={`https://www.${link.url}`} target="_blank">{link.title}</a>
                         ))} */}
                         {visibleLinks.map((link) => (
-                            <div className='2xl:w-96 xl:w-72 lg:w-60 sm:w-52 idk:w-40 xs:w-56 xxs:w-48 xxxxs:w-32 flex justify-center'>
-                                <a key={link._id} className='p-2 font-medium  whitespace-nowrap overflow-hidden text-ellipsis' style={buttonStyles(admin.user.appearance.buttons)} href={`https://www.${link.url}`} target="_blank">{link.title}</a>
+                            <div key={link._id} className='2xl:w-96 xl:w-72 lg:w-60 sm:w-52 idk:w-40 xs:w-56 xxs:w-48 xxxxs:w-32 flex justify-center'>
+                                <a  className='p-2 font-medium  whitespace-nowrap overflow-hidden text-ellipsis' style={buttonStyles(admin.appearance.buttons)} href={`https://www.${link.url}`} target="_blank">{link.title}</a>
                             </div>
                         ))}
                     </div>

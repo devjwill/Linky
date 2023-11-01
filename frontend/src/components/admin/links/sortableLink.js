@@ -2,9 +2,9 @@ import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { FaGripVertical, FaImage, FaStar, FaLock, FaLockOpen, FaChartColumn, FaToggleOff, FaToggleOn, FaTrashCan, FaPencil, FaCheck } from 'react-icons/fa6'
 
-const SortableLink = ({ index, link, id, editIndex, editField, isEditing, handleChange, handleClick, deleteLink, editLink }) => {
+const SortableLink = ({ admin, index, link, id, editIndex, editField, isEditing, handleChange, handleClick, deleteLink, editLink }) => {
 
-    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: link._id })
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: link.id })
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -51,8 +51,10 @@ const SortableLink = ({ index, link, id, editIndex, editField, isEditing, handle
             </div>                                  
         </div>{/* Middle*/}
         <div className='flex flex-col justify-between ml-4 shrink-0'>
-            {link.visible ? <FaToggleOn color='green' size={22} className='hover:cursor-pointer' onClick={() => editLink(link._id, null, null, null, false)}/> : <FaToggleOff color='grey' size={22} className='hover:cursor-pointer' onClick={() => editLink(link._id, null, null, null, true)}/>}
-            <FaTrashCan onClick={() => deleteLink(link.url)} color='black' size={20} className='hover:cursor-pointer'/>
+        {/* editLink(admin.username, admin.links[editIndex[0]].id, null, null, null, true) */}
+        
+            {link.visible ? <FaToggleOn color='green' size={22} className='hover:cursor-pointer' onClick={() => editLink(admin.username, link.id, null, null, null, false)}/> : <FaToggleOff color='grey' size={22} className='hover:cursor-pointer' onClick={() => editLink(admin.username, link.id, null, null, null, true)}/>}
+            <FaTrashCan onClick={() => deleteLink(link.id)} color='black' size={20} className='hover:cursor-pointer'/>
         </div>
     </div>
     )

@@ -8,6 +8,7 @@ import SortableLink from './sortableLink'
 import { DndContext, closestCenter, onDragStat } from '@dnd-kit/core'
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import LinksOrPreview from '../linksOrPreview'
+const validator = require('validator')
 
 const Links = ({ windowWidth, windowHeight, isVisible, setIsVisible, linkIds }) => {
     const { user } = useAuthContext()
@@ -26,7 +27,7 @@ const Links = ({ windowWidth, windowHeight, isVisible, setIsVisible, linkIds }) 
     const [previewHeight, setPreviewHeight] = useState(null)
     // const [isVisible, setIsVisible] = useState('links')
 
-    const editLink = async (id, title, url, thumbnail, visible) => {
+    const editLink = async (username, id, title, url, thumbnail, visible) => {
         
         const content = {
             title: title,
@@ -51,7 +52,7 @@ const Links = ({ windowWidth, windowHeight, isVisible, setIsVisible, linkIds }) 
                 'Content-Type': 'application/json',
                 'authorization': `Bearer ${user.token}`
             },
-            body: JSON.stringify({id, content})
+            body: JSON.stringify({username, id, content})
         })
 
         const json = await response.json()
@@ -71,12 +72,13 @@ const Links = ({ windowWidth, windowHeight, isVisible, setIsVisible, linkIds }) 
     useEffect(() => {
         const handleUserInteraction = (event) => {
             if (isEditing) {
-                console.log(event)
-                console.log(editField.current)
+                // console.log(event)
+                // console.log(editField.current)
                 if (editIndex[1] === 'title') {
                     if (event.key === "Enter") {
                         console.log("enter press")
-                        editLink(admin.links[editIndex[0]]._id, editIndex[2], null, null, null)
+                        editLink(admin.username, admin.links[editIndex[0]].id, editIndex[2], null, null, null)
+                        // console.log("username: " + admin.username, " index: " + editIndex[0] + " title: " + editIndex[2])
                     }
 
                     if (!editField.current.contains(event.target) && event.target.id !== `editTitle-${editIndex[0]}`) {
@@ -84,7 +86,9 @@ const Links = ({ windowWidth, windowHeight, isVisible, setIsVisible, linkIds }) 
                             console.log("title: path clicked")
                         } else {
                             console.log("click: outisde of title")
-                            editLink(admin.links[editIndex[0]]._id, editIndex[2], null, null, null)
+                            editLink(admin.username, admin.links[editIndex[0]].id, editIndex[2], null, null, null)
+                            console.log("username: " + admin.username, " index: " + editIndex[0] + " title: " + editIndex[2])
+            
                         }
                     }
                 }
@@ -92,7 +96,7 @@ const Links = ({ windowWidth, windowHeight, isVisible, setIsVisible, linkIds }) 
                 if(editIndex[1] === 'url') {
                     if (event.key === "Enter") {
                         console.log("enter press")
-                        editLink(admin.links[editIndex[0]]._id, null, editIndex[2], null, null)
+                        editLink(admin.username, admin.links[editIndex[0]].id, null, editIndex[2], null, null)
                     }
 
                     if (!editField.current.contains(event.target) && event.target.id !== `editUrl-${editIndex[0]}`) {
@@ -101,7 +105,7 @@ const Links = ({ windowWidth, windowHeight, isVisible, setIsVisible, linkIds }) 
                             // editLink(admin.links[editIndex[0]]._id, null, editIndex[2], null, null)
                         } else {
                             console.log("click: outside of url")
-                            editLink(admin.links[editIndex[0]]._id, null, editIndex[2], null, null)
+                            editLink(admin.username, admin.links[editIndex[0]].id, null, editIndex[2], null, null)
                         }
                     }
                 }
@@ -201,8 +205,26 @@ const Links = ({ windowWidth, windowHeight, isVisible, setIsVisible, linkIds }) 
             return error
         }
         
-        const linkData = { url, title }
-        const response = await fetch('/api/admin/' + admin.user.username, {
+        if (!validator.isURL(url)) {
+            setIsLoading(false)
+            setError("Please input a valid link") 
+            return error
+        }
+
+        let linkData
+
+        if (url.startsWith('http://')) {
+            linkData = {url: url.substring(7), title}
+        } else if (url.startsWith('https://')) {
+            linkData = {url: url.substring(8), title}
+        } else {
+            linkData = { url, title }
+        }
+    
+
+        
+        
+        const response = await fetch('/api/admin/' + admin.username, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -235,16 +257,16 @@ const Links = ({ windowWidth, windowHeight, isVisible, setIsVisible, linkIds }) 
         console.log('handling title and url edit')
     }
 
-    const deleteLink = async (url) => {
-        console.log('deleting: ' + url)
+    const deleteLink = async (id) => {
+        console.log('deleting: ' + id)
         setError(null)
-        const response = await fetch('/api/admin/' + admin.user.username, {
+        const response = await fetch('/api/admin/' + admin.username, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
                 'authorization': `Bearer ${user.token}`
             },
-            body: JSON.stringify({url})
+            body: JSON.stringify({id})
         })
 
         const json = await response.json()
@@ -296,19 +318,30 @@ const Links = ({ windowWidth, windowHeight, isVisible, setIsVisible, linkIds }) 
 
     const handleDragEnd = (event) => {
         const { active, over } = event
-        const array = admin.links.map(link => link._id)
+        // const array = admin.links.map(link => link.id)
+        // console.log(event)
 
-        console.log("ACTIVE: " + active.id)
-        console.log("OVER: " + over.id)
-
-        const activeIndex = array.indexOf(active.id)
-        const overIndex = array.indexOf(over.id)
+        // console.log("ACTIVE: " + JSON.stringify(active))
+        // console.log("OVER: " + over.data.current.sortable.index)
+        // console.log(event.active.data.id)
+        // if (active.data.sortable.index && over.data.sortable.index) {
+        //     const activeIndex = active.data.sortable.index
+        //     const overIndex = over.data.sortable.index
+        // }
+        // setTimeout(function() {
+        //     console.log("active index: " + active.data.current.sortable.index + " over index: " + over.data.current.sortable.index)
+        // }, [2000])
 
         if (active.id != over.id) {
-            const links = arrayMove(array, activeIndex, overIndex).map(id => admin.links.find(link => link._id === id))
-            const userLinks = arrayMove(array, activeIndex, overIndex)
-            dispatch({type: 'EDIT_ORDER', payload: {links, userLinks}})
-            editOrder(admin.user.username, userLinks)
+            // console.log("active index: " + active.data.current.sortable.index + " over index: " + over.data.current.sortable.index)
+            const userLinks = arrayMove(admin.links, active.data.current.sortable.index, over.data.current.sortable.index)
+            console.log(userLinks)
+            // const links = arrayMove(array, activeIndex, overIndex).map(id => admin.links.find(link => link.id === id))
+            // const links = arrayMove(array, activeIndex, overIndex)
+            // const userLinks = arrayMove(array, activeIndex, overIndex)
+            // console.log("active index: " + active.index + " over index: " + over.index)
+            dispatch({type: 'EDIT_ORDER', payload: {userLinks}})
+            editOrder(admin.username, userLinks)
         } else {
             console.log("drag ended on same link")
         }
@@ -324,9 +357,9 @@ const Links = ({ windowWidth, windowHeight, isVisible, setIsVisible, linkIds }) 
                     <div>
                         {admin && 
                         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} >
-                            <SortableContext items={admin.links.map(link => link._id)} strategy={verticalListSortingStrategy}>
+                            <SortableContext items={admin.links.map(link => link.id)} strategy={verticalListSortingStrategy}>
                                 <div className='p-4 overflow-auto' style={{ maxHeight: `${linksHeight}px` }} id='links'>
-                                    {admin.links.map((link, index) => <SortableLink key={link._id} id={link._id} link={link} index={index} editIndex={editIndex} editField={editField} isEditing={isEditing} handleChange={handleChange} handleClick={handleClick} deleteLink={deleteLink} editLink={editLink} handle/>)}
+                                    {admin.links.map((link, index) => <SortableLink key={link.id} admin={admin} id={link.id} link={link} index={index} editIndex={editIndex} editField={editField} isEditing={isEditing} handleChange={handleChange} handleClick={handleClick} deleteLink={deleteLink} editLink={editLink} handle/>)}
                                 </div>
                             </SortableContext>
                         </DndContext>
@@ -342,9 +375,9 @@ const Links = ({ windowWidth, windowHeight, isVisible, setIsVisible, linkIds }) 
                     <div className='p-10 flex flex-col gap-5'>
                         <LinkButtons admin={admin} isAdding={isAdding} handleLinkAdd={handleLinkAdd} addLink={addLink} isLoading={isLoading} handleTitleAdd={handleTitleAdd} handleCancelLinkAdd={handleCancelLinkAdd} title={title} setTitle={setTitle} url={url} setUrl={setUrl} examples={examples} exampleIndex={exampleIndex} error={error} windowWidth={windowWidth} windowHeight={windowHeight} FaPlus={FaPlus} FaHeading={FaHeading} />
                         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} >
-                            <SortableContext items={admin.links.map(link => link._id)} strategy={verticalListSortingStrategy}>
+                            <SortableContext items={admin.links.map(link => link.id)} strategy={verticalListSortingStrategy}>
                                 <div className='p-4 overflow-auto' style={{ maxHeight: `${linksHeight}px` }} id='links'>
-                                    {admin.links.map((link, index) => <SortableLink key={link._id} id={link._id} link={link} index={index} editIndex={editIndex} editField={editField} isEditing={isEditing} handleChange={handleChange} handleClick={handleClick} deleteLink={deleteLink} editLink={editLink} handle/>)}
+                                    {admin.links.map((link, index) => <SortableLink key={link.id} admin={admin} id={link.id} link={link} index={index} editIndex={editIndex} editField={editField} isEditing={isEditing} handleChange={handleChange} handleClick={handleClick} deleteLink={deleteLink} editLink={editLink} handle/>)}
                                 </div>
                             </SortableContext>
                         </DndContext>

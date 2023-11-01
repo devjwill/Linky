@@ -84,10 +84,11 @@ const userSchema = new Schema({
     //     type: parentSchema,
     //     default: {}
     // } 
-    links: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Link'
-    }]
+    // links: [{
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Link'
+    // }]
+    links: []
 })
 
 //Signup Function

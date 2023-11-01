@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const userRoutes = require('./routes/user')
 const homeRoutes = require('./routes/home')
 const adminRoutes = require('./routes/admin')
+const pageRoutes = require('./routes/pageRoutes')
 
 //Express App
 const app = express()
@@ -20,6 +21,7 @@ app.use((req, res, next) => {
 app.use('/api/user', userRoutes);
 app.use('/api/home', homeRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/page', pageRoutes)
 
 
 //Connect to DataBase

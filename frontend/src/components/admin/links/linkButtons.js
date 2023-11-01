@@ -8,7 +8,7 @@ const LinkButtons = ({admin, isAdding, handleLinkAdd, addLink, isLoading, handle
     } else if (!isAdding) {
         return (
             <div className="flex flex-col gap-4 ">
-                <button onClick={handleLinkAdd} className='flex justify-center items-center gap-1 px-max py-3 rounded-full bg-app-blue text-white font-bold text-xl'><FaPlus className='inline' size={22}/>Add link {windowWidth}</button>
+                <button onClick={handleLinkAdd} className='flex justify-center items-center gap-1 px-max py-3 rounded-full bg-app-blue text-white font-bold text-xl'><FaPlus className='inline' size={22}/>Add link</button>
                 {/* <button onClick={handleTitleAdd} className='self-start flex justify-center gap-1 items-center px-5 py-2 rounded-full bg-gray-300 font-medium text-xl'><FaHeading className='inline'/>Add Header</button> */}
                 {error && <h1 className='bg-red-600 rounded-md p-3 text-white font-bold'>{error}</h1>}
             </div>
